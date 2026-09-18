@@ -1,0 +1,12 @@
+services:
+  api:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: ["gpu"]
+    environment:
+      EMBEDDING_DEVICE: cuda
+      OCR_ENABLED: "true"

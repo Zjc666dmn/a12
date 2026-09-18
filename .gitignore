@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local configuration and secrets
+.env
+.env.local
+.env.*.local
+
+# Runtime artifacts and backups
+outputs/
+data/*.db.bak-*
+.DS_Store
+
