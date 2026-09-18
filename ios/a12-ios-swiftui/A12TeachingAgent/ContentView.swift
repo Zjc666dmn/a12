@@ -2,108 +2,129 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var appState: A12AppState
-    @State private var selectedTab = 0
+
+    private let tabs: [(title: String, icon: String)] = [
+        ("首页", "house.fill"),
+        ("项目", "square.grid.2x2.fill"),
+        ("知识库", "doc.text.magnifyingglass"),
+        ("我的", "person.fill")
+    ]
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            TabView(selection: $selectedTab) {
-                NavigationStack {
-                    HomeView()
-                        .navigationDestination(isPresented: $appState.showStudio) {
-                            StudioView()
-                        }
-                }
-                .tag(0)
-
-                NavigationStack { ProjectsView() }
-                    .tag(1)
-
-                NavigationStack { KnowledgeView() }
-                    .tag(2)
-
-                NavigationStack { ProfileView() }
-                    .tag(3)
+            ZStack {
+                selectedTabView
+                    .id(appState.activeTab)
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .move(edge: .trailing)),
+                        removal: .opacity.combined(with: .move(edge: .leading))
+                    ))
             }
-            .tint(.a12Green)
+            .animation(.a12Smooth, value: appState.activeTab)
 
             if let toast = appState.toast {
                 ToastView(text: toast)
-                    .padding(.bottom, 90)
+                    .padding(.bottom, 12)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            A12TabBar(selectedTab: $selectedTab)
+            customTabBar
+                .background(
+                    Color(red: 0.965, green: 0.98, blue: 1.0)
+                        .ignoresSafeArea(edges: .bottom)
+                )
         }
-        .animation(.snappy, value: appState.toast)
-        .toolbar(.hidden, for: .tabBar)
-        .onChange(of: appState.activeTab) { _, newValue in
-            if selectedTab != newValue {
-                selectedTab = newValue
+        .animation(.a12Smooth, value: appState.toast)
+        .animation(.a12Smooth, value: appState.activeTab)
+        .sheet(isPresented: $appState.showRecentCreations) {
+            RecentCreationsView()
+                .environmentObject(appState)
+                .presentationDetents([.large])
+                .presentationCornerRadius(28)
+        }
+    }
+
+    private var customTabBar: some View {
+        HStack(spacing: 6) {
+            ForEach(Array(tabs.enumerated()), id: \.offset) { index, tab in
+                Button {
+                    animatedTab.wrappedValue = index
+                } label: {
+                    VStack(spacing: 5) {
+                        Image(systemName: tab.icon)
+                            .font(.system(size: 18, weight: .semibold))
+                            .symbolEffect(.bounce, value: appState.activeTab == index)
+                        Text(tab.title)
+                            .font(.caption2.weight(.semibold))
+                    }
+                    .foregroundStyle(appState.activeTab == index ? .white : Color.a12Ink.opacity(0.48))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background {
+                        if appState.activeTab == index {
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(Color.a12Gradient)
+                                .shadow(color: Color.a12Blue.opacity(0.28), radius: 12, y: 6)
+                                .matchedGeometryEffect(id: "activeTab", in: tabNamespace)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(tab.title)
+                .accessibilityAddTraits(appState.activeTab == index ? .isSelected : [])
             }
         }
-        .onChange(of: selectedTab) { _, newValue in
-            if appState.activeTab != newValue {
-                appState.activeTab = newValue
+        .padding(7)
+        .background(Color.white, in: RoundedRectangle(cornerRadius: 25, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 25, style: .continuous)
+                .stroke(LinearGradient(colors: [.white, Color.a12Line.opacity(0.85)], startPoint: .top, endPoint: .bottom))
+        )
+        .shadow(color: Color.a12Ink.opacity(0.12), radius: 20, y: 8)
+        .padding(.horizontal, 14)
+        .padding(.top, 8)
+        .padding(.bottom, 6)
+    }
+
+    @ViewBuilder
+    private var selectedTabView: some View {
+        switch appState.activeTab {
+        case 1:
+            NavigationStack { ProjectsView() }
+        case 2:
+            NavigationStack { KnowledgeView() }
+        case 3:
+            NavigationStack { ProfileView() }
+        default:
+            NavigationStack {
+                HomeView()
+                    .navigationDestination(isPresented: $appState.showStudio) {
+                        StudioView()
+                            .id(appState.conversationID)
+                    }
+                    .navigationDestination(isPresented: $appState.showDocumentOptimizer) {
+                        DocumentOptimizerView()
+                    }
+                    .navigationDestination(isPresented: $appState.showPPTGenerator) {
+                        PPTGeneratorView()
+                    }
+                    .navigationDestination(isPresented: $appState.showInteractiveClassroom) {
+                        InteractiveClassroomView()
+                    }
             }
         }
     }
-}
 
-private struct A12TabBar: View {
-    @Binding var selectedTab: Int
+    @Namespace private var tabNamespace
 
-    private let tabs: [(Int, String, String)] = [
-        (0, "首页", "house.fill"),
-        (1, "项目", "square.grid.2x2.fill"),
-        (2, "知识库", "doc.text.magnifyingglass"),
-        (3, "我的", "person.fill")
-    ]
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(tabs, id: \.0) { tag, title, icon in
-                Button {
-                    withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
-                        selectedTab = tag
-                    }
-                    A12Feedback.selection()
-                } label: {
-                    VStack(spacing: 3) {
-                        ZStack {
-                            Capsule()
-                                .fill(Color.a12Green.opacity(selectedTab == tag ? 0.14 : 0))
-                                .frame(width: 42, height: 30)
-
-                            Image(systemName: icon)
-                                .font(.system(size: selectedTab == tag ? 21 : 19, weight: .semibold))
-                                .foregroundStyle(selectedTab == tag ? Color.a12Green : Color.secondary.opacity(0.65))
-                        }
-                        .frame(height: 30)
-
-                        Text(title)
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(selectedTab == tag ? Color.a12Ink : .secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .accessibilityLabel(title)
-                    .accessibilityAddTraits(selectedTab == tag ? [.isSelected] : [])
-                }
-                .buttonStyle(.plain)
+    private var animatedTab: Binding<Int> {
+        Binding(
+            get: { appState.activeTab },
+            set: { newValue in
+                withAnimation(.a12Smooth) { appState.activeTab = newValue }
             }
-        }
-        .padding(.horizontal, 12)
-        .padding(.top, 8)
-        .padding(.bottom, 10)
-        .background {
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .ignoresSafeArea(.container, edges: .bottom)
-        }
-        .overlay(alignment: .top) {
-            Divider().opacity(0.35)
-        }
-        .shadow(color: .black.opacity(0.05), radius: 10, y: -3)
+        )
     }
 }

@@ -2,144 +2,292 @@ import SwiftUI
 
 struct StudioView: View {
     @EnvironmentObject private var appState: A12AppState
-    var project: ProjectArtifact? = nil
-    private let panels = StudioPanel.allCases
-    @Namespace private var panelNS
-
-    private var headerTitle: String {
-        project?.title ?? "AI 导论课项目"
-    }
-
-    private var headerMeta: String {
-        if let meta = project?.meta, !meta.isEmpty {
-            return meta
-        }
-        return "45 分钟 · 大一 · 案例教学"
-    }
+    private let panels = ["对话", "预览"]
+    @State private var shouldAutoScroll = true
 
     var body: some View {
         ZStack {
-            AmbientBackground()
+            DotGridBackground()
             VStack(spacing: 14) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(headerTitle)
+                        Text(appState.messages.first(where: { $0.isUser }) == nil ? "AI 导论课项目" : "本次备课对话")
                             .font(.title3.weight(.bold))
-                        Text(headerMeta)
+                        Text(conversationSubtitle)
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("Pi Agent")
+                    Text("智能体")
                         .font(.footnote.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.a12Blue)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(Color.a12GreenGradient, in: Capsule())
+                        .background(Color.a12Blue.opacity(0.10), in: Capsule())
+                        .overlay(Capsule().stroke(Color.a12Blue.opacity(0.28)))
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
 
-                HStack(spacing: 0) {
-                    ForEach(panels, id: \.self) { panel in
-                        Text(panel.rawValue)
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(appState.selectedStudioPanel == panel ? Color.a12Ink : .secondary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(
-                                ZStack {
-                                    if appState.selectedStudioPanel == panel {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.white)
-                                            .matchedGeometryEffect(id: "panelIndicator", in: panelNS)
-                                            .overlay {
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Color.a12Separator, lineWidth: 1)
-                                            }
-                                            .shadow(color: .black.opacity(0.08), radius: 6, y: 3)
-                                    }
-                                }
-                            )
-                            .contentShape(Rectangle())
-                            .accessibilityLabel("\(panel.rawValue)面板")
-                            .accessibilityAddTraits(appState.selectedStudioPanel == panel ? [.isSelected] : [])
-                            .onTapGesture {
-                                A12Feedback.selection()
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                                    appState.selectedStudioPanel = panel
-                                }
-                            }
-                    }
+                Picker("工作台", selection: animatedPanel) {
+                    ForEach(panels, id: \.self) { Text($0).tag($0) }
                 }
-                .padding(4)
-                .background(Color.a12Chrome, in: RoundedRectangle(cornerRadius: 14))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color.a12CardStroke, lineWidth: 1)
-                }
+                .pickerStyle(.segmented)
                 .padding(.horizontal, 20)
 
-                ScrollView {
-                    Group {
-                        if appState.selectedStudioPanel == .conversation {
-                            ChatPanel()
-                        } else if appState.selectedStudioPanel == .preview {
-                            PreviewPanel(project: project)
-                        } else {
-                            FilesPanel()
+                ScrollViewReader { proxy in
+                    ZStack(alignment: .bottomTrailing) {
+                        ScrollView {
+                            Group {
+                                if appState.selectedStudioPanel == "对话" {
+                                    ChatPanel()
+                                    Color.clear
+                                        .frame(height: 1)
+                                        .id("teachnova-chat-bottom")
+                                } else if appState.selectedStudioPanel == "预览" {
+                                    PreviewPanel()
+                                }
+                            }
+                            .id(appState.selectedStudioPanel)
+                            .transition(
+                                .asymmetric(
+                                    insertion: .opacity.combined(with: .move(edge: .trailing)),
+                                    removal: .opacity
+                                )
+                            )
+                            .padding(20)
+                        }
+                        .simultaneousGesture(
+                            DragGesture(minimumDistance: 6)
+                                .onChanged { value in
+                                    if appState.selectedStudioPanel == "对话", value.translation.height > 6 {
+                                        shouldAutoScroll = false
+                                    }
+                                }
+                        )
+
+                        if !shouldAutoScroll && appState.isStreamingReply && appState.selectedStudioPanel == "对话" {
+                            Button {
+                                shouldAutoScroll = true
+                                scrollToLatest(proxy)
+                            } label: {
+                                Label("回到最新", systemImage: "arrow.down")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 13)
+                                    .padding(.vertical, 9)
+                                    .background(Color.a12Gradient, in: Capsule())
+                            }
+                            .padding(20)
                         }
                     }
-                    .padding(20)
+                    .onChange(of: appState.streamingReply) { _, _ in scrollToLatest(proxy) }
+                    .onChange(of: appState.messages.count) { _, _ in scrollToLatest(proxy) }
+                    .onChange(of: appState.conversationID) { _, _ in
+                        shouldAutoScroll = true
+                        DispatchQueue.main.async { scrollToLatest(proxy) }
+                    }
                 }
+                .animation(.a12Smooth, value: appState.selectedStudioPanel)
             }
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .smoothScreenTransition()
+    }
+
+    private var conversationSubtitle: String {
+        guard let request = appState.messages.first(where: { $0.isUser })?.text else {
+            return "45 分钟 · 大一 · 案例教学"
+        }
+        let compact = request.replacingOccurrences(of: "\n", with: " ")
+        return compact.count > 34 ? String(compact.prefix(34)) + "…" : compact
+    }
+
+    private var animatedPanel: Binding<String> {
+        Binding(
+            get: { appState.selectedStudioPanel },
+            set: { newValue in
+                withAnimation(.a12Smooth) { appState.selectedStudioPanel = newValue }
+            }
+        )
+    }
+
+    private func scrollToLatest(_ proxy: ScrollViewProxy) {
+        guard shouldAutoScroll, appState.selectedStudioPanel == "对话" else { return }
+        withAnimation(.easeOut(duration: 0.16)) {
+            proxy.scrollTo("teachnova-chat-bottom", anchor: .bottom)
+        }
     }
 }
 
 private struct ChatPanel: View {
     @EnvironmentObject private var appState: A12AppState
-    @State private var revision = "把案例换成校园生活场景，并让小游戏适合 4 人小组。"
+    @State private var revision = ""
+    @State private var freshRequest = ""
+    @StateObject private var speech = SpeechRecognitionService()
+    @FocusState private var revisionFocused: Bool
+    @FocusState private var freshRequestFocused: Bool
 
     var body: some View {
         VStack(spacing: 12) {
-            ForEach(appState.messages) { message in
-                ChatBubble(message: message)
-            }
+            if appState.messages.isEmpty {
+                GlassCard {
+                    VStack(alignment: .leading, spacing: 14) {
+                        Label("新建备课对话", systemImage: "square.and.pencil")
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(Color.a12Ink)
+                        Text("描述课程主题、学生群体、时长或想要的课堂产物。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        ZStack(alignment: .topLeading) {
+                            if freshRequest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !freshRequestFocused {
+                                Text("例如：为大一学生设计一节 45 分钟的人工智能导论课")
+                                    .foregroundStyle(Color.a12Ink.opacity(0.34))
+                                    .padding(.horizontal, 4)
+                                    .padding(.top, 5)
+                                    .allowsHitTesting(false)
+                            }
+                            TextField("", text: $freshRequest, axis: .vertical)
+                                .lineLimit(4...7)
+                                .submitLabel(.send)
+                                .onSubmit { sendFreshRequest() }
+                                .focused($freshRequestFocused)
+                                .frame(minHeight: 126, alignment: .topLeading)
+                        }
+                        HStack {
+                            VoiceInputButton(
+                                speech: speech,
+                                sourceText: { freshRequest },
+                                onTextChange: { freshRequest = $0 },
+                                onError: { appState.showToast($0) }
+                            )
+                            Spacer()
+                            Button("开始生成") { sendFreshRequest() }
+                                .buttonStyle(GradientActionStyle())
+                                .disabled(freshRequest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                    }
+                }
+            } else {
+                ForEach(appState.messages) { message in
+                    ChatBubble(message: message)
+                }
 
-            GlassCard {
-                VStack(spacing: 12) {
-                    ProgressRow(done: true, title: "需求结构化", subtitle: "教学目标、受众、时长、风格已确认")
-                    ProgressRow(done: true, title: "RAG 检索", subtitle: "命中 8 条人工智能导论知识片段")
-                    ProgressRow(done: appState.generationState == "已完成", title: "课件生成", subtitle: appState.generationDetail)
+                GenerationThoughtCard()
+
+                if appState.isStreamingReply {
+                    ChatBubble(message: ChatMessage(text: appState.streamingReply.isEmpty ? "正在整理回答…" : appState.streamingReply + "▍", isUser: false))
+                }
+
+                GlassCard {
+                    VStack(spacing: 12) {
+                        ZStack(alignment: .topLeading) {
+                            if revision.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !revisionFocused {
+                                Text("输入指令继续修改内容")
+                                    .foregroundStyle(Color.a12Ink.opacity(0.34))
+                                    .padding(.horizontal, 4)
+                                    .padding(.top, 5)
+                                    .allowsHitTesting(false)
+                            }
+                            TextField("", text: $revision, axis: .vertical)
+                                .lineLimit(2...4)
+                                .submitLabel(.send)
+                                .onSubmit { sendRevision() }
+                                .focused($revisionFocused)
+                                .frame(minHeight: 72, alignment: .topLeading)
+                        }
+                        HStack {
+                            VoiceInputButton(
+                                speech: speech,
+                                sourceText: { revision },
+                                onTextChange: { revision = $0 },
+                                onError: { appState.showToast($0) }
+                            )
+
+                            Spacer()
+
+                            Button("发送") { sendRevision() }
+                                .buttonStyle(.borderedProminent)
+                                .tint(Color.a12Blue)
+                        }
+                    }
                 }
             }
+        }
+        .animation(.a12Smooth, value: appState.messages.count)
+        .animation(.linear(duration: 0.12), value: appState.streamingReply)
+    }
 
-            GlassCard {
-                VStack(spacing: 12) {
-                    TextEditor(text: $revision)
-                        .frame(height: 72)
-                        .scrollContentBackground(.hidden)
-                    HStack {
-                        Button {
-                            revision = "请把第三部分改成校园学习平台推荐案例，并补充一个课堂提问。"
-                            appState.showToast("已模拟语音识别并填入文本")
-                        } label: {
-                            Image(systemName: "mic.fill")
-                                .frame(width: 40, height: 40)
+    private func sendRevision() {
+        let message = revision.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !message.isEmpty else {
+            appState.showToast("请输入修改意见")
+            return
+        }
+        appState.applyRevision(message)
+        revision = ""
+    }
+
+    private func sendFreshRequest() {
+        let request = freshRequest.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !request.isEmpty else { return }
+        appState.prompt = request
+        appState.runGeneration()
+        freshRequest = ""
+    }
+}
+
+private struct GenerationThoughtCard: View {
+    @EnvironmentObject private var appState: A12AppState
+
+    private let captions = [
+        "识别目标、受众与课堂产物",
+        "匹配本地资料与网页来源",
+        "组织课程结构与互动环节",
+        "逐字呈现模型回答"
+    ]
+
+    var body: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label(appState.isStreamingReply ? "正在输出回答" : "生成进度", systemImage: appState.isStreamingReply ? "text.line.first.and.arrowtriangle.forward" : "brain.head.profile")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(Color.a12Ink)
+                    Spacer()
+                    Text(appState.generationState)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.a12Blue)
+                }
+
+                ForEach(Array(appState.thinkingSteps.enumerated()), id: \.offset) { index, step in
+                    HStack(spacing: 11) {
+                        if index < appState.activeThinkingStep {
+                            Image(systemName: "checkmark")
+                                .font(.caption.weight(.black))
+                                .foregroundStyle(Color.a12Blue)
+                                .frame(width: 30, height: 30)
+                                .background(Color.a12Blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                        } else if index == appState.activeThinkingStep && appState.activeThinkingStep < appState.thinkingSteps.count {
+                            ProgressView()
+                                .tint(Color.a12Blue)
+                                .frame(width: 30, height: 30)
+                                .background(Color.a12Blue.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
+                        } else {
+                            Circle()
+                                .fill(Color.a12Ink.opacity(0.10))
+                                .frame(width: 30, height: 30)
                         }
-                        .buttonStyle(.bordered)
-                        .accessibilityLabel("语音输入修改意见")
-
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(step)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Color.a12Ink)
+                            Text(captions[index])
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                         Spacer()
-
-                        Button("修改") {
-                            appState.applyRevision(revision)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(Color.a12Ink)
                     }
                 }
             }
@@ -149,156 +297,39 @@ private struct ChatPanel: View {
 
 private struct PreviewPanel: View {
     @EnvironmentObject private var appState: A12AppState
-    let project: ProjectArtifact?
-    @State private var currentPage = 0
 
-    private var totalPages: Int {
-        project?.pageCount ?? 18
+    private var generatedContent: String? {
+        if appState.isStreamingReply, !appState.streamingReply.isEmpty { return appState.streamingReply }
+        return appState.messages.last(where: { !$0.isUser })?.text
     }
 
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 14) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("第 \(currentPage + 1) 页 / \(totalPages) 页")
-                        .font(.footnote.weight(.bold))
-                        .foregroundStyle(.white.opacity(0.75))
-                    Text(project?.title ?? "人工智能导论")
-                        .font(.largeTitle.weight(.black))
-                        .foregroundStyle(.white)
+                Label("当前问答文档", systemImage: "doc.text.magnifyingglass")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(Color.a12Ink)
+                Text("会自动同步本次对话的最新生成结果")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if let generatedContent, !generatedContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text(DisplayTextFormatter.plain(generatedContent))
+                        .font(.body)
+                        .foregroundStyle(Color.a12Ink)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 18))
+                        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.a12Line.opacity(0.68)))
+                } else {
+                    ContentUnavailableView(
+                        "等待生成内容",
+                        systemImage: "text.badge.plus",
+                        description: Text("发送备课需求后，这里会显示刚刚生成的文档。")
+                    )
+                    .frame(maxWidth: .infinity, minHeight: 220)
                 }
-                .frame(maxWidth: .infinity, minHeight: 190, alignment: .bottomLeading)
-                .padding(20)
-                .background(
-                    LinearGradient(colors: [Color.a12Ink, Color.a12GreenDark.opacity(0.82)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    in: RoundedRectangle(cornerRadius: 18)
-                )
-                .overlay(
-                    HStack {
-                        if currentPage > 0 {
-                            Button { withAnimation { currentPage -= 1 } } label: {
-                                Image(systemName: "chevron.left.circle.fill")
-                                    .font(.title2)
-                                    .foregroundStyle(.white.opacity(0.8))
-                            }
-                        }
-                        Spacer()
-                        if currentPage < totalPages - 1 {
-                            Button { withAnimation { currentPage += 1 } } label: {
-                                Image(systemName: "chevron.right.circle.fill")
-                                    .font(.title2)
-                                    .foregroundStyle(.white.opacity(0.8))
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 12),
-                    alignment: .center
-                )
-                .gesture(
-                    DragGesture(minimumDistance: 25)
-                        .onEnded { value in
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                if value.translation.width < -30, currentPage < totalPages - 1 {
-                                    currentPage += 1
-                                } else if value.translation.width > 30, currentPage > 0 {
-                                    currentPage -= 1
-                                }
-                            }
-                        }
-                )
-
-                ProgressView(value: Double(currentPage + 1), total: Double(totalPages))
-                    .tint(Color.a12Green)
-                .frame(maxWidth: .infinity)
-
-                ForEach(appState.outlineItems) { item in
-                    OutlineRow(number: item.number, title: item.title, subtitle: item.subtitle)
-                }
-
-                HStack {
-                    Button("导出 PPTX") {
-                        A12Feedback.tap()
-                        appState.showToast("已准备导出 PPTX")
-                    }
-                        .buttonStyle(.borderedProminent)
-                        .tint(Color.a12Ink)
-                    Button("导出 DOCX") {
-                        A12Feedback.tap()
-                        appState.showToast("已准备导出 DOCX")
-                    }
-                        .buttonStyle(.bordered)
-                        .tint(.a12Green)
-                }
-            }
-        }
-    }
-}
-
-private struct FilesPanel: View {
-    @EnvironmentObject private var appState: A12AppState
-
-    var body: some View {
-        VStack(spacing: 12) {
-            if appState.uploadedFiles.isEmpty {
-                GlassCard {
-                    VStack(spacing: 8) {
-                        Image(systemName: "tray")
-                            .font(.title2.weight(.semibold))
-                            .foregroundStyle(Color.a12Green)
-                            .frame(width: 46, height: 46)
-                            .background(Color.a12Green.opacity(0.1), in: Circle())
-
-                        Text("暂无上传资料")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.a12Ink)
-
-                        Text("在首页添加 PDF、图片、视频或文本后，这里会显示解析状态。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
-                }
-            }
-
-            FileRow(kind: "PDF", color: .a12Green, title: "人工智能导论教材节选", subtitle: "已提取知识结构和案例", meta: "2.4M")
-            FileRow(kind: "MP4", color: .a12GreenDark, title: "课堂演示视频片段", subtitle: "已生成 6 条摘要和关键帧", meta: "38M")
-            FileRow(kind: "RAG", color: .a12Green, title: "本地专业知识库", subtitle: "128 条切片 · 向量检索可用", meta: "在线")
-
-            ForEach(appState.uploadedFiles) { file in
-                FileRow(
-                    kind: file.kind,
-                    color: .a12Green,
-                    title: file.name,
-                    subtitle: "已加入项目资料，等待 Pi Agent 解析",
-                    meta: file.formattedSize
-                )
-            }
-
-            GlassCard {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("生成产物")
-                        .font(.headline.weight(.bold))
-                    Text("AI_导论课件.pptx、AI_导论教案.docx、课堂互动小游戏.html")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                    HStack(spacing: 10) {
-                        Button("全部下载") {
-                            A12Feedback.tap()
-                            appState.showToast("已准备下载完整课堂包")
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(Color.a12Ink)
-
-                        Button("继续优化") {
-                            appState.selectedStudioPanel = .conversation
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(.a12Green)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }

@@ -6,327 +6,285 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            AmbientBackground()
-
-            VStack(spacing: 0) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("锐捷 A12")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.secondary)
-                        Text("教学智能体")
-                            .font(.title.weight(.black))
-                            .foregroundStyle(Color.a12Text)
-                    }
-
-                    Spacer()
-
-                    Text("AI")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 42, height: 42)
-                        .background(Color.a12Ink, in: Circle())
+            DotGridBackground()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
+                    header
+                    hero
+                    quickActions
+                    artifactPicker
+                    PromptComposer()
+                    projects
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 12)
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        heroCard
-                            .staggeredAppear(index: 0)
-
-                        ScrollViewReader { proxy in
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 10) {
-                                    ForEach(ArtifactType.allCases) { artifact in
-                                        ChipButton(
-                                            title: artifact.rawValue,
-                                            icon: artifact.systemImage,
-                                            active: appState.selectedArtifact == artifact
-                                        ) {
-                                            appState.select(artifact)
-                                        }
-                                        .id(artifact)
-                                    }
-                                }
-                                .padding(.vertical, 4)
-                            }
-                            .onChange(of: appState.selectedArtifact) { _, artifact in
-                                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                                    proxy.scrollTo(artifact, anchor: .center)
-                                }
-                            }
-                            .onAppear {
-                                proxy.scrollTo(appState.selectedArtifact, anchor: .center)
-                            }
-                        }
-
-                        quickStartSection
-                            .staggeredAppear(index: 2)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 28)
-                }
-
-                PromptComposer()
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 18)
+                .padding(.horizontal, 18)
+                .padding(.top, 10)
+                .padding(.bottom, 24)
             }
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .smoothScreenTransition()
     }
 
-    private var heroCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Pi Agent 已连接")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.secondary)
-
-            Text("把教学想法变成课件和教案")
-                .font(.title.weight(.black))
-                .foregroundStyle(Color.a12Text)
-
-            Text("语音输入、资料解析、RAG 知识融合、PPT 与 Word 一站生成。")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+    private var header: some View {
+        HStack {
+            A12Logo(compact: true)
+            Spacer()
+            Button { appState.activeTab = 3 } label: {
+                Image(systemName: "bell.badge.fill")
+                    .foregroundStyle(Color.a12Blue)
+                    .frame(width: 42, height: 42)
+                    .background(.white.opacity(0.8), in: Circle())
+                    .overlay(Circle().stroke(Color.a12Line.opacity(0.7)))
+            }
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, minHeight: 152, alignment: .topLeading)
-        .background(Color.a12GlassFill, in: RoundedRectangle(cornerRadius: 22))
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22))
-        .overlay {
-            RadialGradient(
-                colors: [Color.a12Green.opacity(0.12), .clear],
-                center: UnitPoint(x: 0.88, y: 0.22),
-                startRadius: 0,
-                endRadius: 180
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 22))
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 22)
-                .stroke(Color.a12CardStroke, lineWidth: 1)
-        }
-        .shadow(color: .black.opacity(0.04), radius: 12, y: 6)
     }
 
-    private var quickStartSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .bottom) {
-                Text("快速开始")
-                    .font(.headline.weight(.bold))
+    private var hero: some View {
+        ZStack(alignment: .bottomTrailing) {
+            RoundedRectangle(cornerRadius: 26)
+                .fill(LinearGradient(colors: [Color.white.opacity(0.92), Color.a12Cyan.opacity(0.2), Color.a12Purple.opacity(0.14)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .overlay(RoundedRectangle(cornerRadius: 26).stroke(.white))
+            Circle().fill(Color.a12Blue.opacity(0.10)).frame(width: 150, height: 150).offset(x: 38, y: 38)
+            ZStack {
+                RoundedRectangle(cornerRadius: 24).fill(Color.a12Gradient).frame(width: 92, height: 112).rotationEffect(.degrees(-8))
+                RoundedRectangle(cornerRadius: 18).fill(.white.opacity(0.22)).frame(width: 64, height: 75)
+                Text("AI").font(.system(size: 28, weight: .black, design: .rounded)).foregroundStyle(.white)
+            }
+            .shadow(color: Color.a12Blue.opacity(0.32), radius: 18, y: 12)
+            .padding(.trailing, 24)
+            .padding(.bottom, 22)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("你好，老师 👋").font(.caption.weight(.semibold)).foregroundStyle(Color.a12Blue)
+                Text("智能生成教案\n让备课更轻松")
+                    .font(.system(size: 25, weight: .black, design: .rounded))
+                    .foregroundStyle(Color.a12Ink)
+                Text("AI 助力教学 · 提升备课效率").font(.caption).foregroundStyle(.secondary)
+                Button {
+                    appState.startFreshConversation()
+                } label: {
+                    Label("开始创作", systemImage: "arrow.right")
+                        .font(.caption.weight(.bold)).foregroundStyle(.white)
+                        .padding(.horizontal, 15).padding(.vertical, 9)
+                        .background(Color.a12Gradient, in: Capsule())
+                }
+                .padding(.top, 3)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(22)
+        }
+        .frame(height: 210)
+        .shadow(color: Color.a12Ink.opacity(0.06), radius: 20, y: 10)
+    }
 
+    private var quickActions: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("AI 教学工具", subtitle: "一键完成备课")
+            HStack(spacing: 10) {
+                FeatureTile(title: "智能教案", subtitle: "快速生成", icon: "wand.and.stars", colors: [.a12Cyan, .a12Blue]) { appState.select(.lessonPlan) }
+                FeatureTile(title: "生成 PPT", subtitle: "多套风格", icon: "rectangle.on.rectangle.fill", colors: [.a12Purple, .a12Blue]) { appState.showPPTGenerator = true }
+                FeatureTile(title: "文档优化", subtitle: "智能润色", icon: "doc.text.fill", colors: [Color.orange.opacity(0.8), .a12Purple]) { appState.showDocumentOptimizer = true }
+            }
+        }
+    }
+
+    private var artifactPicker: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(ArtifactType.allCases) { artifact in
+                    ChipButton(title: artifact.rawValue, icon: artifact == .deck ? "sparkles" : nil, active: appState.selectedArtifact == artifact) { appState.select(artifact) }
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    private var projects: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("最近创作").font(.title3.weight(.bold)).foregroundStyle(Color.a12Ink)
                 Spacer()
-
-                Button("更多模板") {
-                    A12Feedback.tap()
-                    appState.showToast("已展开推荐模板：导论课、实验课、复习课、说课稿")
-                }
-                .font(.caption.weight(.bold))
-                .tint(Color.a12Green)
-                .buttonStyle(.plain)
+                Button("查看全部") { appState.showRecentCreations = true }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.a12Blue)
             }
-
-            VStack(spacing: 10) {
-                HomeTemplateCard(
-                    icon: "rectangle.on.rectangle",
-                    title: "导论课共创",
-                    meta: "12 分钟",
-                    subtitle: "自动追问目标、时长、知识点和课堂互动。"
-                ) {
-                    A12Feedback.tap()
-                    appState.selectedArtifact = .deck
-                    appState.prompt = ArtifactType.deck.prompt
-                    appState.showStudio = true
-                    appState.selectedStudioPanel = .conversation
-                    appState.showToast("已套用导论课共创模板")
+            if appState.recentConversations.isEmpty {
+                GlassCard {
+                    Label("还没有创作记录", systemImage: "clock.arrow.circlepath")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.a12Ink.opacity(0.58))
+                        .frame(maxWidth: .infinity, minHeight: 74, alignment: .center)
                 }
-
-                HomeTemplateCard(
-                    icon: "doc.text",
-                    title: "教案生成",
-                    meta: "Word",
-                    subtitle: "同步生成教学目标、过程、活动与作业。"
-                ) {
-                    A12Feedback.tap()
-                    appState.select(.lessonPlan)
-                }
-
-                HomeTemplateCard(
-                    icon: "square.grid.2x2",
-                    title: "资料融合",
-                    meta: "PDF/视频",
-                    subtitle: "提取参考资料结构、案例与风格。"
-                ) {
-                    A12Feedback.tap()
-                    appState.activeTab = 2
-                    appState.showToast("已进入资料融合与知识库页面")
+            } else {
+                ForEach(appState.recentConversations) { conversation in
+                    ConversationRecordCard(conversation: conversation) {
+                        appState.openConversation(conversation)
+                    }
                 }
             }
+        }
+    }
+
+    private func sectionTitle(_ title: String, subtitle: String) -> some View {
+        HStack {
+            Text(title).font(.title3.weight(.bold)).foregroundStyle(Color.a12Ink)
+            Spacer()
+            Text(subtitle).font(.caption).foregroundStyle(Color.a12Blue)
         }
     }
 }
 
 private struct PromptComposer: View {
     @EnvironmentObject private var appState: A12AppState
-    @State private var showFileImporter = false
-    @State private var pulsing = false
+    @StateObject private var speech = SpeechRecognitionService()
+    @State private var showingFileImporter = false
+    @FocusState private var promptFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-                TextEditor(text: $appState.prompt)
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Color.a12Text.opacity(0.82))
-                .frame(minHeight: 88, maxHeight: 140)
-                .scrollContentBackground(.hidden)
-                .overlay(alignment: .topLeading) {
-                    if appState.prompt.isEmpty {
-                        Text("请输入教学需求…")
+        GlassCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(spacing: 10) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.a12Blue.opacity(0.12))
+                        Image(systemName: "sparkles")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Color.a12Blue)
+                    }
+                    .frame(width: 38, height: 38)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("告诉 AI 你的备课需求")
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(Color.a12Ink)
+                        Text("描述目标、受众和想要的课堂产物")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Label("回车发送", systemImage: "return")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Color.a12Blue)
+                }
+
+                ZStack(alignment: .topLeading) {
+                    if appState.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !promptFocused {
+                        Text("例如：帮我给大一学生设计一节人工智能导论课")
                             .font(.body)
-                            .foregroundStyle(Color.a12Text.opacity(0.3))
-                            .padding(.top, 8)
-                            .padding(.leading, 5)
+                            .foregroundStyle(Color.a12Ink.opacity(0.34))
+                            .padding(.horizontal, 16)
+                            .padding(.top, 17)
                             .allowsHitTesting(false)
                     }
+                    TextField("", text: $appState.prompt, axis: .vertical)
+                        .font(.body)
+                        .foregroundStyle(Color.a12Ink)
+                        .lineLimit(5...8)
+                        .submitLabel(.send)
+                        .onSubmit { sendPrompt() }
+                        .focused($promptFocused)
+                        .frame(minHeight: 126, alignment: .topLeading)
+                        .padding(15)
                 }
+                .background(.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.a12Line.opacity(0.72)))
 
-            HStack(spacing: 12) {
-                Button {
-                    showFileImporter = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(Color.a12Text)
-                        .frame(width: 38, height: 38)
-                        .background(Color.a12IconTile, in: Circle())
-                        .overlay(Circle().stroke(Color.a12Separator))
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("添加参考资料")
-
-                Spacer()
-
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(Color.a12Green)
-                        .frame(width: 8, height: 8)
-                    Text(appState.generationState)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.a12Text.opacity(0.7))
-                }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(Color.a12GlassFillStrong, in: Capsule())
-                .accessibilityLabel("生成状态：\(appState.generationState)")
-
-                Button {
-                    appState.prompt = "请生成一节 45 分钟的人工智能导论课，面向大一学生，要求案例来自校园生活。"
-                    appState.showToast("已模拟语音识别并填入文本")
-                } label: {
-                        Image(systemName: "mic.fill")
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(Color.a12Text.opacity(0.7))
-                            .frame(width: 38, height: 38)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("语音输入")
-
-                Button {
-                    appState.runGeneration()
-                } label: {
-                    ZStack {
-                        if !appState.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            Circle()
-                                .fill(Color.a12Green.opacity(0.4))
-                                .frame(width: 48, height: 48)
-                                .scaleEffect(pulsing ? 1.5 : 1.0)
-                                .opacity(pulsing ? 0 : 0.6)
-                                .animation(.easeOut(duration: 1.4).repeatForever(autoreverses: false), value: pulsing)
-                        }
-                        Image(systemName: "paperplane.fill")
-                            .font(.body.weight(.bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 48, height: 48)
-                            .background(Color.a12Ink, in: Circle())
+                HStack(spacing: 14) {
+                    VoiceInputButton(
+                        speech: speech,
+                        sourceText: { appState.prompt },
+                        onTextChange: { appState.prompt = $0 },
+                        onError: { appState.showToast($0) }
+                    )
+                    Button {
+                        showingFileImporter = true
+                    } label: {
+                        Label("添加资料", systemImage: "paperclip")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.a12Blue)
                     }
+                    .buttonStyle(.plain)
+                    Spacer(minLength: 4)
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(appState.generationState)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text("\(appState.prompt.count) 字")
+                            .font(.caption2)
+                            .foregroundStyle(Color.a12Ink.opacity(0.35))
+                    }
+                    Button(action: sendPrompt) {
+                        HStack(spacing: 7) {
+                            Text("生成")
+                            Image(systemName: "arrow.up")
+                        }
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 16)
+                        .frame(height: 48)
+                        .background(Color.a12Gradient, in: Capsule())
+                        .shadow(color: Color.a12Blue.opacity(0.30), radius: 12, y: 6)
+                    }
+                    .buttonStyle(.plain)
+                    .contentShape(Capsule())
+                    .accessibilityLabel("发送备课需求")
+                    .disabled(appState.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .opacity(appState.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("开始生成")
-                .onAppear { pulsing = true }
             }
         }
-        .padding(18)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22))
-        .overlay {
-            RoundedRectangle(cornerRadius: 22)
-                .stroke(Color.a12CardStroke, lineWidth: 1)
-        }
-        .shadow(color: .black.opacity(0.05), radius: 14, y: 7)
         .fileImporter(
-            isPresented: $showFileImporter,
-            allowedContentTypes: [.pdf, .image, .movie, .text, .item],
+            isPresented: $showingFileImporter,
+            allowedContentTypes: [.pdf, .data, .plainText, .commaSeparatedText],
             allowsMultipleSelection: true
-        ) { results in
-            appState.addUploadedFiles(results)
+        ) { result in
+            switch result {
+            case .success(let urls):
+                appState.importFiles(urls)
+                appState.activeTab = 2
+            case .failure(let error):
+                appState.showToast("资料选择失败：\(error.localizedDescription)")
+            }
         }
+    }
+
+    private func sendPrompt() {
+        appState.runGeneration()
     }
 }
 
-private struct HomeTemplateCard: View {
-    let icon: String
-    let title: String
-    let meta: String
-    let subtitle: String
+private struct ConversationRecordCard: View {
+    let conversation: ConversationRecord
     let action: () -> Void
-    @State private var pressed = false
+
+    private var dateText: String {
+        conversation.createdAt.formatted(date: .abbreviated, time: .shortened)
+    }
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 12) {
-                    Image(systemName: icon)
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(Color.a12Green)
-                        .frame(width: 54, height: 54)
-                        .background(Color.a12IconTile, in: RoundedRectangle(cornerRadius: 16))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.a12Separator)
-                    }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(title)
-                            .font(.subheadline.weight(.bold))
-
-                        Spacer()
-
-                        Text(meta)
-                            .font(.caption.weight(.semibold))
+            GlassCard {
+                HStack(spacing: 14) {
+                    CreationIcon(record: conversation)
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(conversation.title)
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(Color.a12Ink)
+                            .lineLimit(1)
+                        Text(conversation.preview)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                        Text(dateText)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(Color.a12Blue)
                     }
-
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.bold))
+                        .foregroundStyle(Color.a12Blue.opacity(0.7))
                 }
             }
-            .padding(14)
-            .background(Color.a12GlassFillStrong, in: RoundedRectangle(cornerRadius: 18))
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
-            .overlay {
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color.a12CardStroke, lineWidth: 1)
-            }
-            .shadow(color: .black.opacity(0.05), radius: 12, y: 6)
-            .scaleEffect(pressed ? 0.98 : 1)
         }
         .buttonStyle(.plain)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in pressed = true }
-                .onEnded { _ in pressed = false }
-        )
     }
 }
