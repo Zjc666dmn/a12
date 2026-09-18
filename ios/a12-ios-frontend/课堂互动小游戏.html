@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 决策链小挑战</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+      color: #111827;
+      background: linear-gradient(135deg, #f8fafc, #eef6ff);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    main {
+      width: min(900px, 100%);
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, .12);
+    }
+    h1 { margin: 0 0 10px; font-size: 32px; }
+    p { color: #4b5563; line-height: 1.6; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+    .card {
+      border: 1px solid #dbe3ef;
+      border-radius: 14px;
+      padding: 16px;
+      background: #f8fafc;
+      min-height: 130px;
+    }
+    h2 { margin: 0 0 8px; font-size: 18px; }
+    button {
+      margin-top: 22px;
+      border: 0;
+      border-radius: 12px;
+      background: #111827;
+      color: #fff;
+      padding: 12px 16px;
+      font-weight: 700;
+    }
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AI 决策链小挑战</h1>
+    <p>四人小组选择一个校园场景，完成下面四个环节。每组用 1 分钟说明自己的判断链路，并指出一个可能的风险。</p>
+    <section class="grid">
+      <div class="card"><h2>数据输入</h2><p>系统收集了什么信息？例如时间、地点、文本、图像或历史行为。</p></div>
+      <div class="card"><h2>模型判断</h2><p>模型可能在判断什么？例如身份、兴趣、拥挤程度或学习需求。</p></div>
+      <div class="card"><h2>行动反馈</h2><p>系统给用户什么结果？例如推荐、提醒、排序或通行判断。</p></div>
+      <div class="card"><h2>风险提醒</h2><p>这个应用可能带来什么问题？例如隐私、偏差或误判。</p></div>
+    </section>
+    <button onclick="alert('示例反馈：链路完整，能结合校园场景说明 AI 的工作过程。')">提交小组答案</button>
+  </main>
+</body>
+</html>

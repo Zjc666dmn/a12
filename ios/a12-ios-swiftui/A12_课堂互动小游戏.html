@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 决策链挑战 · 课堂互动小游戏</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff; min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 20px; overflow-x: hidden;
+  }
+  h1 { font-size: 3.2rem; margin-bottom: 8px; letter-spacing: 4px;
+       background: linear-gradient(90deg, #4ecca3, #a8e6cf); -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent; }
+  .subtitle { font-size: 1.3rem; color: #a8b2d1; margin-bottom: 18px; }
+  /* 倒计时 */
+  #timer {
+    font-size: 4.5rem; font-weight: bold; font-variant-numeric: tabular-nums;
+    padding: 10px 40px; border-radius: 20px; margin-bottom: 16px;
+    background: rgba(255,255,255,.08); border: 3px solid #4ecca3;
+    box-shadow: 0 0 30px rgba(78,204,163,.35); transition: all .3s;
+  }
+  #timer.danger { border-color: #ff6b6b; color: #ff6b6b; animation: pulse .6s infinite alternate; }
+  @keyframes pulse { to { transform: scale(1.06); } }
+  /* 题目 */
+  #question {
+    font-size: 2rem; text-align: center; max-width: 1100px; margin-bottom: 22px;
+    min-height: 110px; line-height: 1.5; padding: 0 20px;
+  }
+  #question .scene { color: #ffd93d; font-size: 1.4rem; display: block; margin-bottom: 10px; }
+  /* 四组计分板 */
+  .teams { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+           width: 100%; max-width: 1200px; margin-bottom: 20px; }
+  .team {
+    background: rgba(255,255,255,.06); border-radius: 16px; padding: 14px;
+    text-align: center; border: 3px solid transparent; transition: all .25s;
+  }
+  .team .role { font-size: 1.1rem; color: #a8b2d1; margin-bottom: 4px; }
+  .team .score { font-size: 3.2rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+  .team.win { border-color: #ffd93d; box-shadow: 0 0 25px rgba(255,217,61,.4); }
+  .team.flash { animation: flash .5s; }
+  @keyframes flash { 50% { background: rgba(78,204,163,.45); } }
+  /* 选项 */
+  .options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+             width: 100%; max-width: 1200px; margin-bottom: 20px; }
+  .opt {
+    padding: 18px 8px; font-size: 1.5rem; border-radius: 14px; cursor: pointer;
+    border: 2px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08);
+    transition: all .15s;
+  }
+  .opt:hover { transform: translateY(-4px); background: rgba(78,204,163,.25); }
+  .opt.correct { background: #4ecca3; color: #1a1a2e; font-weight: bold; }
+  .opt.wrong { background: #ff6b6b; opacity: .8; }
+  .controls { display: flex; gap: 16px; }
+  button.big {
+    font-size: 1.4rem; padding: 12px 36px; border-radius: 40px; border: none;
+    cursor: pointer; font-weight: bold; transition: transform .15s;
+  }
+  button.big:hover { transform: scale(1.05); }
+  #nextBtn { background: #ffd93d; color: #1a1a2e; }
+  #restartBtn { background: transparent; color: #a8b2d1; border: 2px solid #a8b2d1; }
+  #result {
+    font-size: 2.6rem; margin: 10px 0; min-height: 50px; text-align: center;
+  }
+  .hidden { display: none !important; }
+  #status { color: #a8b2d1; font-size: 1.1rem; margin-top: 6px; }
+</style>
+</head>
+<body>
+  <h1>🎯 AI 决策链挑战</h1>
+  <div class="subtitle">四组轮流答题 · 每轮 30 秒 · 答对 +10 分</div>
+  <div id="timer">30</div>
+  <div id="question"></div>
+  <div class="teams" id="teams"></div>
+  <div class="options" id="options"></div>
+  <div id="result" class="hidden"></div>
+  <div class="controls">
+    <button class="big" id="nextBtn">开始游戏</button>
+    <button class="big" id="restartBtn">🔄 重新开始</button>
+  </div>
+  <div id="status"></div>
+
+<script>
+// ===== 数据：题目均为 AI 决策链五环节的辨认与应用 =====
+const QUESTIONS = [
+  { scene: "刷脸门禁", q: "摄像头拍下你的正脸照片，这属于决策链的哪个环节？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 0 },
+  { scene: "刷脸门禁", q: "系统从照片中定位眼距、鼻梁等关键信息，属于哪个环节？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 1 },
+  { scene: "食堂客流预测", q: "模型根据历史客流判断明天 12 点会很拥挤，属于哪个环节？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 2 },
+  { scene: "食堂客流预测", q: "屏幕上显示'预计排队 15 分钟'，属于哪个环节？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 3 },
+  { scene: "学习平台推荐", q: "你给推荐的课程点了'不感兴趣'，第二天推荐变了。这个动作属于哪个环节？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 4 },
+  { scene: "语音助手", q: "你对着音箱说'今天天气怎么样'，这句话被录音上传。属于哪个环节？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 0 },
+  { scene: "学习平台推荐", q: "系统统计你最近看的都是编程课，这个'统计喜好'的过程属于？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 1 },
+  { scene: "语音助手", q: "音箱回答'今天晴，25 度'并播放语音，属于哪个环节？",
+    a: ["数据采集","特征提取","模型推理","结果输出","反馈优化"], correct: 3 },
+];
+const ROLES = ["🛰️ 数据采集员", "🧠 模型训练员", "🔍 结果检验员", "👑 队长"];
+const TEAM_COLORS = ["#4ecca3", "#ffd93d", "#ff6b6b", "#6bc1ff"];
+
+let scores = [0,0,0,0], round = 0, turn = 0, timerId = null, timeLeft = 30, locked = false;
+
+const $ = id => document.getElementById(id);
+
+function buildTeams() {
+  $("teams").innerHTML = ROLES.map((r,i) =>
+    `<div class="team" id="team${i}" style="border-bottom:6px solid ${TEAM_COLORS[i]}">
+       <div class="role">${r}</div>
+       <div class="score" id="score${i}">0</div>
+     </div>`).join("");
+}
+
+function showQuestion() {
+  locked = false;
+  const item = QUESTIONS[round];
+  const teamIdx = turn % 4;
+  $("status").textContent = `第 ${round+1} 题 · 轮到【${ROLES[teamIdx]}】小组作答`;
+  // 高亮当前作答小组
+  for (let i=0;i<4;i++) $("team"+i).style.outline = i===teamIdx ? `3px solid ${TEAM_COLORS[i]}` : "none";
+  $("question").innerHTML = `<span class="scene">📍 场景：${item.scene}</span>${item.q}`;
+  $("options").innerHTML = item.a.map((t,i) =>
+    `<div class="opt" onclick="answer(${i})">${i+1}. ${t}</div>`).join("");
+  $("result").classList.add("hidden");
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerId); timeLeft = 30;
+  $("timer").textContent = timeLeft; $("timer").classList.remove("danger");
+  timerId = setInterval(() => {
+    timeLeft--;
+    $("timer").textContent = timeLeft;
+    if (timeLeft <= 5) $("timer").classList.add("danger");
+    if (timeLeft <= 0) { clearInterval(timerId); answer(-1); } // 超时视为答错
+  }, 1000);
+}
+
+function answer(i) {
+  if (locked) return; locked = true;
+  clearInterval(timerId);
+  const item = QUESTIONS[round], teamIdx = turn % 4;
+  const opts = document.querySelectorAll(".opt");
+  opts.forEach(o => o.onclick = null);
+  opts[item.correct].classList.add("correct");
+  const res = $("result"); res.classList.remove("hidden");
+  if (i === item.correct) {
+    scores[teamIdx] += 10;
+    $("score"+teamIdx).textContent = scores[teamIdx];
+    $("team"+teamIdx).classList.add("flash");
+    setTimeout(()=>$("team"+teamIdx).classList.remove("flash"), 500);
+    res.textContent = `✅ 答对了！【${ROLES[teamIdx]}】+10 分`;
+  } else if (i === -1) {
+    res.textContent = `⏰ 时间到！正确答案：${item.a[item.correct]}`;
+  } else {
+    opts[i].classList.add("wrong");
+    res.textContent = `❌ 答错了，正确答案：${item.a[item.correct]}`;
+  }
+}
+
+function next() {
+  if (round === 0 && turn === 0 && !locked) { $("nextBtn").textContent = "下一题 ➡️"; showQuestion(); return; }
+  if (!locked && timeLeft > 0) return; // 必须作答或超时后才能下一题
+  round++; turn++;
+  if (round >= QUESTIONS.length) { finish(); return; }
+  showQuestion();
+}
+
+function finish() {
+  clearInterval(timerId);
+  $("timer").textContent = "🏁"; $("timer").classList.remove("danger");
+  const max = Math.max(...scores);
+  const winners = scores.map((s,i)=>s===max?i:-1).filter(i=>i>=0);
+  winners.forEach(i => $("team"+i).classList.add("win"));
+  $("question").innerHTML = "游戏结束！恭喜获胜小组 🎉";
+  $("options").innerHTML = "";
+  $("result").classList.remove("hidden");
+  $("result").textContent = winners.length === 1
+    ? `🏆 冠军：【${ROLES[winners[0]]}】小组，${max} 分！`
+    : `🤝 平局！${winners.map(i=>ROLES[i]).join("、")} 都是冠军，各 ${max} 分！`;
+  $("nextBtn").classList.add("hidden");
+  $("status").textContent = "点击'重新开始'再来一局";
+}
+
+function restart() {
+  scores = [0,0,0,0]; round = 0; turn = 0; locked = false;
+  clearInterval(timerId);
+  buildTeams();
+  $("timer").textContent = "30"; $("timer").classList.remove("danger");
+  $("question").innerHTML = "点击「开始游戏」开始 AI 决策链挑战！";
+  $("options").innerHTML = "";
+  $("result").classList.add("hidden");
+  $("nextBtn").classList.remove("hidden");
+  $("nextBtn").textContent = "开始游戏";
+  $("status").textContent = "";
+}
+
+$("nextBtn").onclick = next;
+$("restartBtn").onclick = restart;
+restart();
+</script>
+</body>
+</html>

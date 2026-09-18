@@ -1,0 +1,2595 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A12 教学智能体演示系统</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      --ink: #101318;
+      --muted: #5f656d;
+      --line: rgba(17, 24, 39, 0.10);
+      --line-strong: rgba(17, 24, 39, 0.14);
+      --paper: #f6f7f5;
+      --surface: rgba(255, 255, 255, 0.58);
+      --surface-strong: rgba(255, 255, 255, 0.72);
+      --panel: rgba(255, 255, 255, 0.92);
+      --green: #2c7a20;
+      --green-strong: #22611a;
+      --green-soft: #f1faee;
+      --green-border: rgba(118, 190, 94, 0.32);
+      --blue: #2563eb;
+      --orange: #f97316;
+      --red: #e5484d;
+      --violet: #7c3aed;
+      --radius-sm: 14px;
+      --radius-md: 18px;
+      --radius-lg: 22px;
+      --radius-xl: 32px;
+      --radius-pill: 999px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 28px;
+      --shadow-sm: 0 8px 18px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 14px 32px rgba(15, 23, 42, 0.07);
+      --shadow-lg: 0 28px 64px rgba(22, 45, 33, 0.14);
+      --glass-blur: blur(24px) saturate(1.16);
+      --focus: #2c7a20;
+      --focus-ring: rgba(44, 122, 32, 0.20);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --speed-fast: 140ms;
+      --speed-base: 220ms;
+      --speed-slow: 520ms;
+      --shadow: var(--shadow-lg);
+      font-family: var(--font-sans);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: #edf1ee;
+      display: block;
+    }
+
+    ::selection {
+      color: var(--green-strong);
+      background: var(--green-soft);
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    .demo {
+      position: relative;
+      isolation: isolate;
+      min-height: 100vh;
+      padding: 56px 28px 84px;
+      overflow: hidden;
+    }
+
+    .demo-bg {
+      position: absolute;
+      inset: -10%;
+      z-index: -2;
+      transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0);
+      transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .demo-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("assets/hero-greenhouse.jpg") center / cover no-repeat;
+      animation: greenhouse-drift 38s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+
+    .demo-particles {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      left: var(--left, 50%);
+      bottom: -20px;
+      width: var(--size, 4px);
+      height: var(--size, 4px);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow:
+        0 0 10px rgba(255, 255, 255, 0.72),
+        0 0 24px rgba(154, 234, 122, 0.24);
+      opacity: 0;
+      animation: particle-rise var(--duration, 26s) linear var(--delay, 0s) infinite;
+    }
+
+    @keyframes greenhouse-drift {
+      from { transform: scale(1.08) rotate(-0.45deg); }
+      to { transform: scale(1.16) rotate(0.45deg); }
+    }
+
+    @keyframes particle-rise {
+      0% { opacity: 0; transform: translate3d(0, 24px, 0) scale(0.6); }
+      18% { opacity: 0.85; }
+      80% { opacity: 0.4; }
+      100% { opacity: 0; transform: translate3d(var(--drift, 60px), -92vh, 0) scale(1.12); }
+    }
+
+    @keyframes stage-enter {
+      from { opacity: 0; transform: translateY(24px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes light-sweep {
+      0% { left: -80%; opacity: 0; }
+      12% { opacity: 1; }
+      42% { left: 150%; opacity: 0; }
+      100% { left: 150%; opacity: 0; }
+    }
+
+    .demo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(
+          ellipse 82% 64% at 50% 38%,
+          rgba(255, 255, 255, 0.44),
+          rgba(255, 255, 255, 0.08) 76%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.42) 0%,
+          rgba(255, 255, 255, 0.16) 42%,
+          rgba(226, 238, 228, 0.34) 100%
+        );
+    }
+
+    .stage {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .phone {
+      width: 390px;
+      height: 844px;
+      margin: 0 auto;
+      border: 12px solid #14171c;
+      border-radius: 52px;
+      background: rgba(255, 255, 255, 0.66);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 118px;
+      height: 30px;
+      transform: translateX(-50%);
+      border-radius: 0 0 18px 18px;
+      background: #14171c;
+      z-index: 30;
+    }
+
+    .app {
+      height: 100%;
+      background: var(--paper);
+      display: grid;
+      grid-template-rows: 58px 1fr 76px;
+      overflow: hidden;
+    }
+
+    .status {
+      height: 58px;
+      padding: 16px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(247, 248, 251, 0.86);
+      backdrop-filter: var(--glass-blur);
+      z-index: 20;
+    }
+
+    .signals {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .signal {
+      width: 18px;
+      height: 12px;
+      border-radius: 3px;
+      border: 2px solid var(--ink);
+      position: relative;
+    }
+
+    .signal::after {
+      content: "";
+      position: absolute;
+      right: -5px;
+      top: 3px;
+      width: 3px;
+      height: 5px;
+      background: var(--ink);
+      border-radius: 0 2px 2px 0;
+    }
+
+    main {
+      overflow: auto;
+      padding: 10px 18px 18px;
+      scrollbar-width: none;
+    }
+
+    main::-webkit-scrollbar { display: none; }
+
+    .screen { display: none; animation: in 180ms ease both; }
+    .screen.active { display: block; }
+
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--ink);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 28px; line-height: 1.08; letter-spacing: 0; }
+    h2 { font-size: 20px; line-height: 1.2; }
+    h3 { font-size: 15px; line-height: 1.25; }
+    p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .hero {
+      border-radius: 28px;
+      min-height: 210px;
+      padding: 22px;
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(16, 19, 24, 0.86), rgba(44, 122, 32, 0.34)),
+        url("data:image/svg+xml,%3Csvg width='700' height='420' viewBox='0 0 700 420' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='700' height='420' fill='%23dce9f8'/%3E%3Cg opacity='.7'%3E%3Crect x='46' y='58' width='230' height='148' rx='20' fill='%23ffffff'/%3E%3Crect x='72' y='84' width='156' height='13' rx='6' fill='%232563eb'/%3E%3Crect x='72' y='118' width='128' height='10' rx='5' fill='%2394a3b8'/%3E%3Crect x='72' y='142' width='172' height='10' rx='5' fill='%2394a3b8'/%3E%3Ccircle cx='496' cy='144' r='76' fill='%2318a058'/%3E%3Cpath d='M456 145l26 28 58-66' fill='none' stroke='%23fff' stroke-width='16' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='333' y='246' width='280' height='104' rx='24' fill='%23ffffff'/%3E%3Crect x='364' y='276' width='200' height='12' rx='6' fill='%23f97316'/%3E%3Crect x='364' y='306' width='132' height='10' rx='5' fill='%2394a3b8'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero p { color: rgba(255, 255, 255, 0.82); max-width: 270px; }
+    .hero h1 { max-width: 270px; }
+
+    .pill-row, .chip-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0;
+      scrollbar-width: none;
+    }
+
+    .pill-row::-webkit-scrollbar, .chip-row::-webkit-scrollbar { display: none; }
+
+    .pill {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.66);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms ease;
+    }
+
+    .pill:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .pill.active {
+      color: #fff;
+      border-color: var(--ink);
+      background: var(--ink);
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      margin-bottom: 10px;
+    }
+
+    .link {
+      border: 0;
+      background: transparent;
+      color: var(--green);
+      font-weight: 800;
+      font-size: 12px;
+      padding: 0;
+    }
+
+    .composer {
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .composer textarea {
+      width: 100%;
+      height: 82px;
+      resize: none;
+      border: 0;
+      outline: 0;
+      font: inherit;
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
+    .composer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .icon-row { display: flex; gap: 8px; }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform var(--speed-base) var(--ease), box-shadow var(--speed-base) var(--ease), border-color var(--speed-base) var(--ease), background-color var(--speed-base) var(--ease), color var(--speed-base) var(--ease);
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: var(--surface-strong);
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+    }
+
+    .run-btn {
+      border: 0;
+      border-radius: var(--radius-pill);
+      padding: 10px 14px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 82px;
+      justify-content: center;
+      transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms ease;
+    }
+
+    .run-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .card-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.58);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+      transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.1);
+    }
+
+    .template-card {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 12px;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .thumb {
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      color: #fff;
+    }
+
+    .thumb.blue, .thumb.green, .thumb.orange {
+      background: #f7f8f5;
+      color: #1f2937;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .studio-head {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .back {
+      border: 0;
+      background: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .agent-dot {
+      border-radius: var(--radius-pill);
+      background: #eaf8ef;
+      color: #137544;
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tabs {
+      padding: 4px;
+      background: #e9edf3;
+      border-radius: var(--radius-pill);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      padding: 9px 0;
+      font-size: 12px;
+      font-weight: 800;
+      color: #596173;
+    }
+
+    .tab.active {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .chat {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bubble {
+      max-width: 86%;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .bubble.agent {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-top-left-radius: 6px;
+    }
+
+    .bubble.user {
+      margin-left: auto;
+      color: #fff;
+      background: var(--ink);
+      border-top-right-radius: 6px;
+    }
+
+    .progress {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .check {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      background: #eaf8ef;
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .check.pending {
+      color: var(--orange);
+      animation: pending-pulse 1.6s ease-in-out infinite;
+    }
+
+    .pending { background: #fff7ed; color: var(--orange); }
+
+    .preview {
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .slide-art {
+      height: 182px;
+      background:
+        linear-gradient(135deg, rgba(16, 19, 24, 0.88), rgba(44, 122, 32, 0.44)),
+        url("data:image/svg+xml,%3Csvg width='600' height='320' viewBox='0 0 600 320' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='600' height='320' fill='%23eff6ff'/%3E%3Crect x='48' y='52' width='212' height='64' rx='12' fill='%23ffffff'/%3E%3Crect x='72' y='76' width='144' height='12' rx='6' fill='%232563eb'/%3E%3Ccircle cx='440' cy='118' r='58' fill='%23f97316'/%3E%3Crect x='330' y='198' width='190' height='54' rx='16' fill='%23ffffff'/%3E%3Crect x='356' y='218' width='122' height='10' rx='5' fill='%2318a058'/%3E%3C/svg%3E");
+      background-size: cover;
+      color: #fff;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+    }
+
+    .slide-art p { color: rgba(255,255,255,.78); }
+    .preview-body { padding: 14px; }
+
+    .outline {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .outline-row {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .num {
+      width: 32px;
+      height: 32px;
+      border-radius: 11px;
+      background: var(--green-soft);
+      color: var(--green);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: #fff;
+      margin-bottom: 10px;
+    }
+
+    .empty-state {
+      padding: var(--space-4);
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.42);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .empty-state span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .field-error {
+      display: block;
+      margin-top: var(--space-2);
+      padding: 8px 10px;
+      border: 1px solid rgba(229, 72, 77, 0.22);
+      border-radius: var(--radius-sm);
+      background: #fff1f0;
+      color: #a9232b;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .field-error[hidden] {
+      display: none;
+    }
+
+    .toast {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 92px;
+      z-index: 50;
+      padding: 13px 14px;
+      color: #fff;
+      background: rgba(16, 19, 24, 0.92);
+      border-radius: 17px;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes pending-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.48; }
+    }
+
+    .file-ico {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 11px;
+    }
+
+    .file-ico.pdf { background: var(--red); }
+    .file-ico.mp4 { background: var(--violet); }
+    .file-ico.rag { background: var(--green); }
+
+    .export-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .export {
+      border: 0;
+      background: var(--ink);
+      color: #fff;
+      border-radius: var(--radius-pill);
+      padding: 13px 10px;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .export.alt {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .settings-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .setting-row {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .template-card:active,
+    .setting-row:active,
+    .pill:active,
+    .icon-btn:active,
+    .run-btn:active,
+    .export:active {
+      transform: scale(0.98);
+    }
+
+    .badge {
+      border-radius: var(--radius-pill);
+      background: var(--green-soft);
+      color: var(--green);
+      padding: 6px 8px;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .bottom-nav {
+      background: rgba(255, 255, 255, 0.86);
+      border-top: 1px solid var(--line);
+      backdrop-filter: var(--glass-blur);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 14px 14px;
+      z-index: 20;
+    }
+
+    .nav-item {
+      border: 0;
+      background: transparent;
+      color: #8a93a3;
+      display: grid;
+      gap: 3px;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .nav-item.active { color: var(--ink); }
+
+    svg { display: block; }
+
+    .side {
+      padding: 6px 0;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+    }
+
+    .side h2 {
+      font-size: 34px;
+      line-height: 1.05;
+      max-width: 620px;
+      margin-bottom: 12px;
+    }
+
+    .side p {
+      font-size: 16px;
+      max-width: 660px;
+    }
+
+    .console {
+      margin-top: 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric, .workflow, .deliverables {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      backdrop-filter: var(--glass-blur);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric {
+      min-height: 94px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .metric strong {
+      font-size: 18px;
+      line-height: 1.15;
+    }
+
+    .workflow {
+      padding: 18px;
+    }
+
+    .workflow h3, .deliverables h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .flow-step {
+      min-height: 78px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 10px;
+    }
+
+    .flow-step b {
+      display: block;
+      width: 24px;
+      height: 24px;
+      border-radius: 9px;
+      background: #111827;
+      color: #fff;
+      font-size: 11px;
+      line-height: 24px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .flow-step span {
+      color: #374151;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .deliverables {
+      padding: 18px;
+    }
+
+    .artifact-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .artifact-action {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+
+    .artifact-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+    }
+
+    .artifact-action strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .artifact-action span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Delivery skin: light, quiet, glassy, and product-like. */
+    body {
+      background: #e2eae4;
+      padding: 0;
+    }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+      width: min(1320px, 100%);
+      min-height: 820px;
+      grid-template-columns: 376px 1fr;
+      gap: 54px;
+      align-items: center;
+      padding: 82px 54px 46px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 1px 1px, rgba(16, 19, 24, 0.035) 1px, transparent 0) 0 0 / 20px 20px,
+        rgba(255, 255, 255, 0.36);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow:
+        0 32px 86px rgba(22, 45, 33, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      overflow: hidden;
+      animation: stage-enter 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .light-sweep {
+      position: absolute;
+      top: -45%;
+      left: -80%;
+      width: 55%;
+      height: 190%;
+      z-index: 0;
+      pointer-events: none;
+      transform: rotate(12deg);
+      background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.34) 48%, transparent 100%);
+      animation: light-sweep 8s ease-in-out 1.2s infinite;
+    }
+
+    .side,
+    .phone {
+      position: relative;
+      z-index: 1;
+      animation: stage-enter 900ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      top: 22px;
+      left: 24px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #ff5f57;
+      box-shadow: 24px 0 #ffbd2e, 48px 0 #28c840;
+      z-index: 2;
+    }
+
+    .stage::after {
+      content: "⌂";
+      position: absolute;
+      top: 20px;
+      left: 112px;
+      color: var(--muted);
+      font-size: 18px;
+      z-index: 2;
+    }
+
+    .phone {
+      width: 360px;
+      height: 760px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.52);
+      box-shadow:
+        0 26px 70px rgba(15, 23, 42, 0.14),
+        inset 0 0 0 8px rgba(255, 255, 255, 0.68);
+    }
+
+    .phone::before {
+      top: 13px;
+      width: 92px;
+      height: 24px;
+      border-radius: 999px;
+      background: #161719;
+    }
+
+    .app {
+      grid-template-rows: 52px 1fr 68px;
+      background:
+        radial-gradient(circle at 1px 1px, rgba(16, 19, 24, 0.035) 1px, transparent 0) 0 0 / 20px 20px,
+        rgba(255, 255, 255, 0.54);
+    }
+
+    .status {
+      height: 52px;
+      padding: 15px 22px 0;
+      background: rgba(251, 251, 250, 0.62);
+    }
+
+    main {
+      padding: 8px 18px 14px;
+    }
+
+    .topbar {
+      margin-bottom: 18px;
+    }
+
+    .topbar p, .studio-head p {
+      color: #8a8f98;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    h1 { font-size: 25px; }
+    h2 { font-size: 22px; }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: var(--ink);
+      box-shadow: 0 0 0 5px rgba(141, 211, 106, 0.18);
+    }
+
+    .hero {
+      min-height: 152px;
+      padding: 18px;
+      border: 1px solid rgba(17, 24, 39, 0.1);
+      border-radius: var(--radius-lg);
+      color: #111;
+      background:
+        radial-gradient(circle at 88% 22%, rgba(132, 204, 22, 0.24), transparent 26%),
+        radial-gradient(circle at 1px 1px, rgba(16, 19, 24, 0.05) 1px, transparent 0) 0 0 / 18px 18px,
+        rgba(255, 255, 255, 0.58);
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero p {
+      color: var(--muted);
+    }
+
+    .hero h1 {
+      max-width: 260px;
+      font-size: 25px;
+      line-height: 1.08;
+    }
+
+    .pill {
+      border-color: var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pill.active {
+      color: var(--green);
+      border-color: var(--green-border);
+      background: var(--green-soft);
+      box-shadow: none;
+    }
+
+    .composer {
+      border-color: var(--line-strong);
+      border-radius: var(--radius-lg);
+      background: var(--surface-strong);
+      box-shadow: var(--shadow-md);
+      transition: border-color var(--speed-base) var(--ease), box-shadow var(--speed-base) var(--ease);
+    }
+
+    .composer textarea {
+      height: 88px;
+      background: transparent;
+      font-size: 14px;
+    }
+
+    .composer:focus-within {
+      border-color: var(--focus);
+      box-shadow: var(--shadow-md), 0 0 0 3px var(--focus-ring);
+    }
+
+    .icon-btn, .back {
+      border-color: var(--line);
+      border-radius: 999px;
+      background: var(--surface-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .run-btn, .export {
+      border-radius: var(--radius-pill);
+      background: var(--ink);
+    }
+
+    .export.alt {
+      background: var(--green-soft);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+
+    .card, .file-row, .setting-row {
+      border-color: var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .thumb {
+      border-radius: var(--radius-sm);
+      background: #f4f5f2;
+      color: #333;
+      border: 1px solid var(--line);
+    }
+
+    .thumb.blue, .thumb.green, .thumb.orange {
+      background: #f7f8f5;
+      color: #1f2937;
+    }
+
+    .tabs {
+      border: 1px solid var(--line);
+      background: rgba(244, 245, 242, 0.56);
+      border-radius: 999px;
+    }
+
+    .tab {
+      border-radius: 999px;
+    }
+
+    .tab.active {
+      color: var(--green);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .agent-dot, .badge {
+      color: var(--green);
+      background: var(--green-soft);
+      border: 1px solid var(--green-border);
+    }
+
+    .bubble.agent {
+      background: rgba(255, 255, 255, 0.66);
+    }
+
+    .bubble.user {
+      background: var(--ink);
+    }
+
+    .slide-art {
+      background:
+        radial-gradient(circle at 76% 28%, rgba(132, 204, 22, 0.28), transparent 24%),
+        radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.16) 1px, transparent 0) 0 0 / 18px 18px,
+        linear-gradient(135deg, var(--ink), #3f3f46);
+    }
+
+    .bottom-nav {
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .nav-item.active {
+      color: var(--green);
+    }
+
+    .side {
+      align-self: center;
+      padding: 0;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius-md);
+      display: grid;
+      place-items: center;
+      background: #fff;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .brand-mark svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .brand-name {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .od-chips {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .od-chip {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform var(--speed-base) var(--ease), box-shadow var(--speed-base) var(--ease), border-color var(--speed-base) var(--ease), background-color var(--speed-base) var(--ease), color var(--speed-base) var(--ease);
+    }
+
+    .od-chip.active {
+      color: var(--green);
+      background: var(--green-soft);
+      border-color: var(--green-border);
+    }
+
+    .desktop-composer {
+      width: min(760px, 100%);
+      min-height: 188px;
+      margin: 0 auto;
+      border: 1.5px solid var(--line-strong);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      box-shadow: var(--shadow-md);
+      padding: 18px;
+      display: grid;
+      align-content: end;
+    }
+
+    .desktop-composer p {
+      color: #40454d;
+      min-height: 78px;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .desktop-feedback {
+      min-height: 34px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--green-soft);
+      border: 1px solid var(--green-border);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: 160ms ease;
+    }
+
+    .desktop-feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .desktop-composer-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .tool-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .round-add, .send-round {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .round-add {
+      width: 38px;
+      height: 38px;
+      color: var(--muted);
+    }
+
+    .send-round {
+      width: 44px;
+      height: 44px;
+      color: var(--green-soft);
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .model-pill {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--green-border);
+      background: var(--green-soft);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .status-pill {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .green-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #35c75a;
+      box-shadow: 0 0 0 5px rgba(53, 199, 90, 0.13);
+    }
+
+    .desktop-meta {
+      width: min(760px, 100%);
+      margin: 12px auto 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .desktop-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .sample-block {
+      margin-top: 56px;
+    }
+
+    .sample-block h3 {
+      margin-bottom: 14px;
+      font-size: 18px;
+    }
+
+    .sample-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .sample-card {
+      min-height: 160px;
+      border: 1px solid rgba(17, 24, 39, 0.1);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.58);
+      overflow: hidden;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.055);
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      transition: transform var(--speed-base) var(--ease), box-shadow var(--speed-base) var(--ease), border-color var(--speed-base) var(--ease);
+      transition: 160ms ease;
+    }
+
+    .sample-card:hover,
+    .sample-card.active {
+      border-color: var(--focus);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .sample-thumb {
+      display: block;
+      height: 104px;
+      background:
+        radial-gradient(circle at 72% 28%, rgba(132, 204, 22, 0.26), transparent 24%),
+        radial-gradient(circle at 1px 1px, rgba(16, 19, 24, 0.055) 1px, transparent 0) 0 0 / 16px 16px,
+        rgba(255, 255, 255, 0.52);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sample-card:nth-child(2) .sample-thumb {
+      background:
+        linear-gradient(90deg, transparent 48%, rgba(17, 24, 39, 0.08) 48% 49%, transparent 49%),
+        radial-gradient(circle at 1px 1px, rgba(16, 19, 24, 0.055) 1px, transparent 0) 0 0 / 16px 16px,
+        rgba(255, 255, 255, 0.52);
+    }
+
+    .sample-card:nth-child(3) .sample-thumb {
+      background:
+        linear-gradient(135deg, var(--ink), #52525b),
+        var(--ink);
+    }
+
+    .sample-card strong {
+      display: block;
+      padding: 14px 14px 3px;
+      font-size: 15px;
+    }
+
+    .sample-card span {
+      display: block;
+      padding: 0 14px 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .feature-list {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .feature {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .feature strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .feature span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .demo-bg,
+      .demo-bg::before,
+      .particle,
+      .light-sweep,
+      .stage,
+      .check.pending,
+      .side,
+      .phone {
+        animation: none !important;
+      }
+
+      .pill,
+      .run-btn,
+      .card,
+      .sample-card,
+      .artifact-action {
+        transition-duration: 1ms !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .demo { padding: 48px 18px 72px; }
+      .stage {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding: 70px 32px 36px;
+        gap: 34px;
+      }
+      .side { order: -1; }
+      .side h2 { font-size: 28px; }
+      .feature-list { grid-template-columns: 1fr; }
+      .metric-grid, .flow, .artifact-actions, .sample-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 450px) {
+      .demo { padding: 0; background: var(--paper); }
+      .stage {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+      .stage::before,
+      .stage::after {
+        display: none;
+      }
+      .side { display: none; }
+      .phone {
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <section class="demo" id="demo" aria-label="交互演示区">
+    <div class="demo-bg" aria-hidden="true"></div>
+    <div class="demo-particles" aria-hidden="true"></div>
+  <div class="stage">
+      <div class="light-sweep" aria-hidden="true"></div>
+    <section class="phone" aria-label="A12 教学智能体移动端">
+      <div class="app">
+        <header class="status">
+          <span>9:41</span>
+          <div class="signals" aria-hidden="true">
+            <svg width="18" height="12" viewBox="0 0 18 12"><path d="M1 11h2V7H1v4Zm4 0h2V5H5v6Zm4 0h2V3H9v8Zm4 0h2V1h-2v10Z" fill="currentColor"/></svg>
+            <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 3.1c2 0 3.8.7 5.3 2.1l1.4-1.5A9.8 9.8 0 0 0 1.8 3.7l1.4 1.5a7.6 7.6 0 0 1 5.3-2.1Zm0 3.4c1.1 0 2.1.4 2.9 1.1l1.4-1.5a6.3 6.3 0 0 0-8.6 0l1.4 1.5c.8-.7 1.8-1.1 2.9-1.1Zm0 3.2 1.8-1.8a2.6 2.6 0 0 0-3.6 0l1.8 1.8Z" fill="currentColor"/></svg>
+            <span class="signal"></span>
+          </div>
+        </header>
+
+        <main>
+          <section class="screen active" id="home">
+            <div class="topbar">
+              <div>
+                <p>锐捷 A12</p>
+                <h2>教学智能体</h2>
+              </div>
+              <div class="avatar">AI</div>
+            </div>
+
+            <div class="hero">
+              <div>
+                <p>Pi Agent 已连接</p>
+                <h1>把教学想法变成课件和教案</h1>
+              </div>
+              <p>语音输入、资料解析、RAG 知识融合、PPT 与 Word 一站生成。</p>
+            </div>
+
+            <div class="section">
+              <div class="pill-row" aria-label="产物类型">
+                <button class="pill active" data-product="ppt">课件 PPT</button>
+                <button class="pill" data-product="doc">Word 教案</button>
+                <button class="pill" data-product="game">互动小游戏</button>
+                <button class="pill" data-product="animation">课堂动画</button>
+              </div>
+            </div>
+
+            <div class="section composer">
+              <textarea id="brief" aria-label="教学需求" spellcheck="false">我要做一节 45 分钟的人工智能导论课，面向大一学生，希望包含生活案例和一个课堂互动。</textarea>
+              <div class="composer-actions">
+                <div class="icon-row">
+                  <button class="icon-btn" title="语音输入" aria-label="语音输入" data-voice-target="brief">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Zm6-3a6 6 0 0 1-12 0H4a8 8 0 0 0 7 7.9V22h2v-3.1a8 8 0 0 0 7-7.9h-2Z" fill="currentColor"/></svg>
+                  </button>
+                  <button class="icon-btn" title="上传资料" aria-label="上传资料" data-upload-trigger="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M11 16V7.8L8.4 10.4 7 9l5-5 5 5-1.4 1.4L13 7.8V16h-2Zm-5 4a2 2 0 0 1-2-2v-3h2v3h12v-3h2v3a2 2 0 0 1-2 2H6Z" fill="currentColor"/></svg>
+                  </button>
+                </div>
+                <button class="run-btn" id="startBtn">生成
+                  <svg width="15" height="15" viewBox="0 0 24 24"><path d="m13 5 7 7-7 7-1.4-1.4 4.6-4.6H4v-2h12.2l-4.6-4.6L13 5Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <p class="field-error" id="briefError" hidden>请先输入教学需求，或选择一个快速模板。</p>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <h3>快速开始</h3>
+                <button class="link" data-toast="已展开推荐模板：导论课、实验课、复习课、说课稿">更多模板</button>
+              </div>
+              <div class="card-grid">
+                <article class="card template-card" role="button" tabindex="0" data-template="intro">
+                  <div class="thumb blue">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 5h16v12H4V5Zm2 2v8h12V7H6Zm4 12h4v2h-4v-2Z" fill="currentColor"/></svg>
+                  </div>
+                  <div>
+                    <div class="meta"><h3>导论课共创</h3><span class="small">12 分钟</span></div>
+                    <p>自动追问目标、时长、知识点和课堂互动。</p>
+                  </div>
+                </article>
+                <article class="card template-card" role="button" tabindex="0" data-template="lesson-plan">
+                  <div class="thumb green">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 4h14v16H5V4Zm3 4h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z" fill="currentColor"/></svg>
+                  </div>
+                  <div>
+                    <div class="meta"><h3>教案生成</h3><span class="small">Word</span></div>
+                    <p>同步生成教学目标、过程、活动与作业。</p>
+                  </div>
+                </article>
+                <article class="card template-card" role="button" tabindex="0" data-template="materials">
+                  <div class="thumb orange">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm3 3v10h10V7H7Zm2 2h6v2H9V9Zm0 4h4v2H9v-2Z" fill="currentColor"/></svg>
+                  </div>
+                  <div>
+                    <div class="meta"><h3>资料融合</h3><span class="small">PDF/视频</span></div>
+                    <p>提取参考资料结构、案例与风格。</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" id="studio">
+            <div class="studio-head">
+              <button class="back" id="backBtn" aria-label="返回">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path d="m10.8 12 5.6-5.6L15 5l-7 7 7 7 1.4-1.4L10.8 12Z" fill="currentColor"/></svg>
+              </button>
+              <div>
+                <h3>AI 导论课项目</h3>
+                <p>45 分钟 · 大一 · 案例教学</p>
+              </div>
+              <span class="agent-dot">Pi Agent</span>
+            </div>
+
+            <div class="tabs" role="tablist">
+              <button class="tab active" id="tabChat" role="tab" aria-selected="true" aria-controls="chatPanel" data-panel="chat">对话</button>
+              <button class="tab" id="tabPreview" role="tab" aria-selected="false" aria-controls="previewPanel" data-panel="preview">预览</button>
+              <button class="tab" id="tabFiles" role="tab" aria-selected="false" aria-controls="filesPanel" data-panel="files">文件</button>
+            </div>
+
+            <div class="panel active" id="chatPanel" role="tabpanel" aria-labelledby="tabChat">
+              <div class="chat">
+                <div class="bubble user">我要做一节 45 分钟的人工智能导论课，面向大一学生。</div>
+                <div class="bubble agent">我会先确认教学目标、重点难点和互动形式。是否希望课程更偏概念入门，还是更偏应用案例？</div>
+                <div class="bubble user">偏应用案例，最后加一个小游戏。</div>
+                <div class="bubble agent">已整理为课件生成指令集：概念引入、生活案例、核心能力、课堂互动、总结作业。正在融合本地知识库和参考资料。</div>
+              </div>
+
+              <div class="card progress">
+                <div class="step">
+                  <span class="check">✓</span>
+                  <div><h3>需求结构化</h3><p>教学目标、受众、时长、风格已确认</p></div>
+                  <span class="small">完成</span>
+                </div>
+                <div class="step">
+                  <span class="check">✓</span>
+                  <div><h3>RAG 检索</h3><p>命中 8 条人工智能导论知识片段</p></div>
+                  <span class="small">完成</span>
+                </div>
+                <div class="step">
+                  <span class="check pending">·</span>
+                  <div><h3>课件生成</h3><p id="generationStatusText">PPT、Word 教案、小游戏方案</p></div>
+                  <span class="small" id="generationStatus" role="status" aria-live="polite">进行中</span>
+                </div>
+              </div>
+
+              <div class="section composer">
+                <textarea id="revisionInput" aria-label="修改意见" spellcheck="false" style="height:58px">把案例换成校园生活场景，并让小游戏适合 4 人小组。</textarea>
+                <div class="composer-actions">
+                  <div class="icon-row">
+                    <button class="icon-btn" title="语音修改" aria-label="语音修改" data-voice-target="revision">
+                      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Zm6-3a6 6 0 0 1-12 0H4a8 8 0 0 0 7 7.9V22h2v-3.1a8 8 0 0 0 7-7.9h-2Z" fill="currentColor"/></svg>
+                    </button>
+                  </div>
+                  <button class="run-btn" id="reviseBtn">修改</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel" id="previewPanel" role="tabpanel" aria-labelledby="tabPreview">
+              <article class="card preview">
+                <div class="slide-art">
+                  <p>第 1 页 / 18 页</p>
+                  <h2>人工智能导论</h2>
+                </div>
+                <div class="preview-body">
+                  <div class="meta"><h3>课件初稿</h3><span class="small">可导出 PPTX</span></div>
+                  <div class="outline">
+                    <div class="outline-row"><span class="num">01</span><div><h3 id="outlineTitle1">什么是人工智能</h3><p id="outlineBody1">从校园刷脸、推荐系统切入</p></div></div>
+                    <div class="outline-row"><span class="num">02</span><div><h3 id="outlineTitle2">AI 如何学习</h3><p id="outlineBody2">数据、模型、训练与推理</p></div></div>
+                    <div class="outline-row"><span class="num">03</span><div><h3 id="outlineTitle3">小组互动</h3><p id="outlineBody3">识别生活中的 AI 决策链</p></div></div>
+                  </div>
+                  <div class="export-row">
+                    <button class="export" data-download="pptx">导出 PPTX</button>
+                    <button class="export alt" data-download="docx">导出 DOCX</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div class="panel" id="filesPanel" role="tabpanel" aria-labelledby="tabFiles">
+              <div class="file-row">
+                <div class="file-ico pdf">PDF</div>
+                <div><h3>人工智能导论教材节选</h3><p>已提取知识结构和案例</p></div>
+                <span class="small">2.4M</span>
+              </div>
+              <div class="file-row">
+                <div class="file-ico mp4">MP4</div>
+                <div><h3>课堂演示视频片段</h3><p>已生成 6 条摘要和关键帧</p></div>
+                <span class="small">38M</span>
+              </div>
+              <div class="file-row">
+                <div class="file-ico rag">RAG</div>
+                <div><h3>本地专业知识库</h3><p>128 条切片 · 向量检索可用</p></div>
+                <span class="small">在线</span>
+              </div>
+              <div class="empty-state" id="uploadedEmpty">
+                <strong>暂无新上传资料</strong>
+                <span>PDF、Word、PPT、图片或视频上传后会显示在这里。</span>
+              </div>
+              <div id="uploadedFiles"></div>
+
+              <div class="card">
+                <h3>生成产物</h3>
+                <p>AI_导论课件.pptx、AI_导论教案.docx、课堂互动小游戏.html</p>
+                <div class="export-row">
+                  <button class="export" data-download="all">全部下载</button>
+                  <button class="export alt" data-open-panel="chat">继续优化</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" id="projects">
+            <div class="topbar">
+              <div>
+                <p>最近项目</p>
+                <h2>课程工作台</h2>
+              </div>
+              <button class="icon-btn" data-open-screen="home" aria-label="新建项目">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5Z" fill="currentColor"/></svg>
+              </button>
+            </div>
+
+            <div class="card-grid">
+              <article class="card template-card" role="button" tabindex="0" data-open-studio>
+                <div class="thumb blue">
+                  <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 5h16v12H4V5Zm2 2v8h12V7H6Zm4 12h4v2h-4v-2Z" fill="currentColor"/></svg>
+                </div>
+                <div>
+                  <div class="meta"><h3>AI 导论课项目</h3><span class="small">进行中</span></div>
+                  <p>18 页 PPT · 1 份教案 · 1 个小游戏</p>
+                </div>
+              </article>
+              <article class="card template-card" role="button" tabindex="0" data-toast="已打开机器学习入门项目预览">
+                <div class="thumb green">
+                  <svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 4h14v16H5V4Zm3 4h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z" fill="currentColor"/></svg>
+                </div>
+                <div>
+                  <div class="meta"><h3>机器学习入门</h3><span class="small">已完成</span></div>
+                  <p>案例讲解版，已导出 PPT 和 Word 教案。</p>
+                </div>
+              </article>
+              <article class="card template-card" role="button" tabindex="0" data-toast="已打开课堂互动小游戏草稿">
+                <div class="thumb orange">
+                  <svg width="24" height="24" viewBox="0 0 24 24"><path d="M7 4h10v2h2v14H5V6h2V4Zm0 4v10h10V8H7Zm2 2h6v2H9v-2Zm0 4h4v2H9v-2Z" fill="currentColor"/></svg>
+                </div>
+                <div>
+                  <div class="meta"><h3>课堂互动小游戏</h3><span class="small">草稿</span></div>
+                  <p>四人小组活动，适合课堂实时演示。</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="screen" id="knowledge">
+            <div class="topbar">
+              <div>
+                <p>RAG Knowledge</p>
+                <h2>本地知识库</h2>
+              </div>
+              <button class="icon-btn" data-toast="已模拟上传资料" aria-label="上传知识库资料">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M11 16V7.8L8.4 10.4 7 9l5-5 5 5-1.4 1.4L13 7.8V16h-2Zm-5 4a2 2 0 0 1-2-2v-3h2v3h12v-3h2v3a2 2 0 0 1-2 2H6Z" fill="currentColor"/></svg>
+              </button>
+            </div>
+
+            <div class="card">
+              <div class="meta"><h3>知识库状态</h3><span class="badge">在线</span></div>
+              <p>128 条文本切片，覆盖人工智能导论、课程大纲、案例素材和课堂活动设计。</p>
+              <div class="progress">
+                <div class="step"><span class="check">✓</span><div><h3>文本向量化</h3><p>PDF、Word、PPT 已完成解析</p></div><span class="small">100%</span></div>
+                <div class="step"><span class="check">✓</span><div><h3>视频摘要</h3><p>关键帧与讲解摘要已入库</p></div><span class="small">6 条</span></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <h3>资料列表</h3>
+                <button class="link" data-toast="知识库已重新检索">重新检索</button>
+              </div>
+              <div class="file-row">
+                <div class="file-ico pdf">PDF</div>
+                <div><h3>人工智能导论教材节选</h3><p>知识点、案例、章节结构</p></div>
+                <span class="small">已入库</span>
+              </div>
+              <div class="file-row">
+                <div class="file-ico mp4">MP4</div>
+                <div><h3>AI 应用课堂视频</h3><p>关键帧、摘要、课堂问答</p></div>
+                <span class="small">已入库</span>
+              </div>
+              <div class="file-row">
+                <div class="file-ico rag">DOC</div>
+                <div><h3>课程标准与教学大纲</h3><p>目标、重难点、考核方式</p></div>
+                <span class="small">已入库</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" id="profile">
+            <div class="topbar">
+              <div>
+                <p>Account</p>
+                <h2>我的</h2>
+              </div>
+              <div class="avatar">师</div>
+            </div>
+
+            <div class="card">
+              <div class="meta"><h3>Pi Agent 后端</h3><span class="badge">已连接</span></div>
+              <p>当前为前端演示模式，已预留对话流、任务进度、文件列表和导出接口。</p>
+            </div>
+
+            <div class="section settings-list">
+              <div class="setting-row" role="button" tabindex="0" data-toast="模型设置：当前演示使用 Pi Agent + RAG 编排">
+                <div class="file-ico rag">AI</div>
+                <div><h3>模型与智能体</h3><p>需求理解、RAG、课件生成</p></div>
+                <span class="small">配置</span>
+              </div>
+              <div class="setting-row" role="button" tabindex="0" data-toast="导出设置：PPTX、DOCX、HTML5 已启用">
+                <div class="file-ico pdf">OUT</div>
+                <div><h3>导出设置</h3><p>PPT、Word、HTML5 小游戏</p></div>
+                <span class="small">默认</span>
+              </div>
+              <div class="setting-row" role="button" tabindex="0" data-toast="团队空间：已模拟 3 人协作">
+                <div class="file-ico mp4">TEAM</div>
+                <div><h3>团队空间</h3><p>比赛材料、演示视频、补充资料</p></div>
+                <span class="small">3 人</span>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <nav class="bottom-nav" aria-label="底部导航">
+          <button class="nav-item active" data-nav="home">
+            <svg width="21" height="21" viewBox="0 0 24 24"><path d="M4 10.4 12 4l8 6.4V20h-6v-5h-4v5H4v-9.6Z" fill="currentColor"/></svg>
+            首页
+          </button>
+          <button class="nav-item" data-nav="projects">
+            <svg width="21" height="21" viewBox="0 0 24 24"><path d="M4 5h16v4H4V5Zm0 6h7v8H4v-8Zm9 0h7v8h-7v-8Z" fill="currentColor"/></svg>
+            项目
+          </button>
+          <button class="nav-item" data-nav="knowledge">
+            <svg width="21" height="21" viewBox="0 0 24 24"><path d="M5 4h14v16H5V4Zm3 4h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z" fill="currentColor"/></svg>
+            知识库
+          </button>
+          <button class="nav-item" data-nav="profile">
+            <svg width="21" height="21" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0H5Z" fill="currentColor"/></svg>
+            我的
+          </button>
+        </nav>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        <input id="fileInput" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.mp4" hidden>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M16 4.5A11.5 11.5 0 1 0 16 27.5 11.5 11.5 0 0 0 16 4.5Zm-4.8 6.4 11.5 4.7-6.1 2.1-2.3 6.2-3.1-13Z" fill="currentColor"/></svg>
+        </span>
+        <strong class="brand-name">A12 Studio</strong>
+      </div>
+
+      <div class="od-chips" aria-label="产物类型">
+        <button class="od-chip active" data-desktop-mode="ppt">课件</button>
+        <button class="od-chip" data-desktop-mode="doc">教案</button>
+        <button class="od-chip" data-desktop-mode="game">小游戏</button>
+        <button class="od-chip" data-desktop-mode="knowledge">知识库</button>
+        <button class="od-chip" data-desktop-mode="all">全部</button>
+      </div>
+
+      <div class="desktop-composer">
+        <p id="desktopPrompt">为大一学生生成一节 45 分钟人工智能导论课，自动融合课程资料，输出 PPT、Word 教案和四人小组互动小游戏。</p>
+        <div class="desktop-composer-foot">
+          <div class="tool-cluster">
+            <button class="round-add" data-desktop-add="true" aria-label="添加资料">+</button>
+            <span class="model-pill" id="desktopModeLabel">课件生成</span>
+            <span class="status-pill"><i class="green-dot"></i> <span id="desktopStatus">Pi Agent ready</span></span>
+          </div>
+          <button class="send-round" data-desktop-run="true" aria-label="生成完整交付包">
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M11 18V7.8l-4.6 4.6L5 11l7-7 7 7-1.4 1.4L13 7.8V18h-2Z" fill="currentColor"/></svg>
+          </button>
+        </div>
+        <div class="desktop-feedback" id="desktopFeedback" role="status" aria-live="polite">已就绪</div>
+      </div>
+
+      <div class="desktop-meta">
+        <span>资料库：3 份</span>
+        <span>生成产物：PPTX / DOCX / HTML5</span>
+        <span>状态：可演示</span>
+      </div>
+
+      <div class="sample-block">
+        <h3>示例产物</h3>
+        <div class="sample-row">
+          <button class="sample-card" data-desktop-sample="pptx" data-download="pptx">
+            <span class="sample-thumb"></span>
+            <strong>AI 导论课件</strong>
+            <span>12 页视觉版 PPTX</span>
+          </button>
+          <button class="sample-card" data-desktop-sample="docx" data-download="docx">
+            <span class="sample-thumb"></span>
+            <strong>教学设计文档</strong>
+            <span>完整 Word 教案</span>
+          </button>
+          <button class="sample-card" data-desktop-sample="all" data-download="all">
+            <span class="sample-thumb"></span>
+            <strong>互动课堂包</strong>
+            <span>含小游戏方案</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+  </section>
+
+  <script>
+    const screens = [...document.querySelectorAll('.screen')];
+    const navItems = [...document.querySelectorAll('.nav-item')];
+    const home = document.querySelector('#home');
+    const studio = document.querySelector('#studio');
+    const startBtn = document.querySelector('#startBtn');
+    const backBtn = document.querySelector('#backBtn');
+    const toast = document.querySelector('#toast');
+    const briefInput = document.querySelector('#brief');
+    const revisionInput = document.querySelector('#revisionInput');
+    const reviseBtn = document.querySelector('#reviseBtn');
+    const chatLog = document.querySelector('#chatPanel .chat');
+    const fileInput = document.querySelector('#fileInput');
+    const uploadedFiles = document.querySelector('#uploadedFiles');
+    const uploadedEmpty = document.querySelector('#uploadedEmpty');
+    const briefError = document.querySelector('#briefError');
+    const generationStatus = document.querySelector('#generationStatus');
+    const generationStatusText = document.querySelector('#generationStatusText');
+    const desktopPrompt = document.querySelector('#desktopPrompt');
+    const desktopModeLabel = document.querySelector('#desktopModeLabel');
+    const desktopStatus = document.querySelector('#desktopStatus');
+    const desktopFeedback = document.querySelector('#desktopFeedback');
+    const productPills = [...document.querySelectorAll('[data-product]')];
+    const desktopModeButtons = [...document.querySelectorAll('[data-desktop-mode]')];
+    const sampleCards = [...document.querySelectorAll('[data-desktop-sample]')];
+    const tabs = [...document.querySelectorAll('.tab')];
+    const panels = {
+      chat: document.querySelector('#chatPanel'),
+      preview: document.querySelector('#previewPanel'),
+      files: document.querySelector('#filesPanel')
+    };
+
+    const productPrompts = {
+      ppt: {
+        toast: '已选择课件 PPT 生成模式',
+        brief: '我要做一节 45 分钟的人工智能导论课，面向大一学生，希望包含生活案例和一个课堂互动。'
+      },
+      doc: {
+        toast: '已选择 Word 教案生成模式',
+        brief: '请帮我生成一份人工智能导论课的 Word 教案，包含教学目标、学情分析、教学流程、课堂活动、评价方式和课后作业。'
+      },
+      game: {
+        toast: '已选择互动小游戏生成模式',
+        brief: '请设计一个适合 4 人小组参与的 AI 决策链课堂小游戏，能帮助学生理解数据输入、模型判断和行动反馈。'
+      },
+      animation: {
+        toast: '已选择课堂动画生成模式',
+        brief: '请为人工智能导论课设计一个 60 秒知识点动画，解释数据、模型、训练和推理之间的关系。'
+      }
+    };
+
+    const desktopModes = {
+      ppt: {
+        label: '课件生成',
+        prompt: '为大一学生生成一节 45 分钟人工智能导论课，自动融合课程资料，输出结构完整、视觉统一的 PPT 课件。',
+        feedback: '已切换到课件生成，左侧首页需求已同步。',
+        action: () => {
+          briefInput.value = productPrompts.ppt.brief;
+          productPills.forEach(item => item.classList.toggle('active', item.dataset.product === 'ppt'));
+          showScreen('home');
+        }
+      },
+      doc: {
+        label: '教案生成',
+        prompt: '生成配套 Word 教案，包含课程信息、教学目标、学情分析、流程安排、互动设计、评价方式和课后作业。',
+        feedback: '已切换到教案生成，左侧已同步 Word 教案模板。',
+        action: () => {
+          briefInput.value = productPrompts.doc.brief;
+          productPills.forEach(item => item.classList.toggle('active', item.dataset.product === 'doc'));
+          showScreen('home');
+        }
+      },
+      game: {
+        label: '互动设计',
+        prompt: '设计一个适合四人小组参与的课堂小游戏，让学生拆解数据输入、模型判断和行动反馈。',
+        feedback: '已切换到互动小游戏，左侧需求已换成小组活动。',
+        action: () => {
+          briefInput.value = productPrompts.game.brief;
+          productPills.forEach(item => item.classList.toggle('active', item.dataset.product === 'game'));
+          showScreen('home');
+        }
+      },
+      knowledge: {
+        label: '资料解析',
+        prompt: '上传教材、课程大纲、课堂视频和参考资料，构建本地知识库并为生成内容提供依据。',
+        feedback: '已打开知识库页面，可查看资料解析和 RAG 状态。',
+        action: () => showScreen('knowledge')
+      },
+      all: {
+        label: '完整交付',
+        prompt: '一键生成完整课堂包：PPTX 课件、DOCX 教案、HTML5 互动小游戏和资料解析摘要。',
+        feedback: '已切换到完整交付模式，可点击右侧发送按钮生成全部产物。',
+        action: () => showStudio('preview')
+      }
+    };
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function showDesktopFeedback(message) {
+      if (!desktopFeedback) return;
+      desktopFeedback.textContent = message;
+      desktopFeedback.classList.add('show');
+      clearTimeout(showDesktopFeedback.timer);
+      showDesktopFeedback.timer = setTimeout(() => desktopFeedback.classList.remove('show'), 2200);
+    }
+
+    function setDesktopMode(mode) {
+      const config = desktopModes[mode];
+      if (!config) return;
+      desktopModeButtons.forEach(item => item.classList.toggle('active', item.dataset.desktopMode === mode));
+      desktopPrompt.textContent = config.prompt;
+      desktopModeLabel.textContent = config.label;
+      desktopStatus.textContent = mode === 'all' ? 'ready to export' : 'Pi Agent ready';
+      config.action();
+      showDesktopFeedback(config.feedback);
+    }
+
+    function showScreen(id) {
+      screens.forEach(screen => screen.classList.toggle('active', screen.id === id));
+      navItems.forEach(item => item.classList.toggle('active', item.dataset.nav === id));
+      document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showStudio(panel = 'chat') {
+      showScreen('studio');
+      setPanel(panel);
+    }
+
+    function appendBubble(text, kind) {
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${kind}`;
+      bubble.textContent = text;
+      chatLog.appendChild(bubble);
+    }
+
+    function setPanel(panelName) {
+      tabs.forEach(item => {
+        const active = item.dataset.panel === panelName;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-selected', String(active));
+      });
+      Object.entries(panels).forEach(([name, panel]) => {
+        panel.classList.toggle('active', name === panelName);
+      });
+    }
+
+    function downloadFile(filename, mimeType, content) {
+      const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 800);
+    }
+
+    function downloadStaticFile(filename) {
+      const link = document.createElement('a');
+      link.href = `./${encodeURIComponent(filename)}`;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    function escapeXml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&apos;');
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function crc32(bytes) {
+      let table = crc32.table;
+      if (!table) {
+        table = crc32.table = new Uint32Array(256);
+        for (let n = 0; n < 256; n++) {
+          let c = n;
+          for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+          table[n] = c >>> 0;
+        }
+      }
+      let c = 0xffffffff;
+      for (const byte of bytes) c = table[(c ^ byte) & 0xff] ^ (c >>> 8);
+      return (c ^ 0xffffffff) >>> 0;
+    }
+
+    function writeUint16(target, offset, value) {
+      target[offset] = value & 255;
+      target[offset + 1] = (value >>> 8) & 255;
+    }
+
+    function writeUint32(target, offset, value) {
+      target[offset] = value & 255;
+      target[offset + 1] = (value >>> 8) & 255;
+      target[offset + 2] = (value >>> 16) & 255;
+      target[offset + 3] = (value >>> 24) & 255;
+    }
+
+    function makeZip(files) {
+      const encoder = new TextEncoder();
+      const locals = [];
+      const centrals = [];
+      let offset = 0;
+
+      files.forEach(file => {
+        const nameBytes = encoder.encode(file.name);
+        const dataBytes = encoder.encode(file.content);
+        const crc = crc32(dataBytes);
+        const local = new Uint8Array(30 + nameBytes.length + dataBytes.length);
+        writeUint32(local, 0, 0x04034b50);
+        writeUint16(local, 4, 20);
+        writeUint16(local, 6, 0);
+        writeUint16(local, 8, 0);
+        writeUint32(local, 14, crc);
+        writeUint32(local, 18, dataBytes.length);
+        writeUint32(local, 22, dataBytes.length);
+        writeUint16(local, 26, nameBytes.length);
+        local.set(nameBytes, 30);
+        local.set(dataBytes, 30 + nameBytes.length);
+        locals.push(local);
+
+        const central = new Uint8Array(46 + nameBytes.length);
+        writeUint32(central, 0, 0x02014b50);
+        writeUint16(central, 4, 20);
+        writeUint16(central, 6, 20);
+        writeUint16(central, 8, 0);
+        writeUint16(central, 10, 0);
+        writeUint32(central, 16, crc);
+        writeUint32(central, 20, dataBytes.length);
+        writeUint32(central, 24, dataBytes.length);
+        writeUint16(central, 28, nameBytes.length);
+        writeUint32(central, 42, offset);
+        central.set(nameBytes, 46);
+        centrals.push(central);
+        offset += local.length;
+      });
+
+      const centralSize = centrals.reduce((sum, item) => sum + item.length, 0);
+      const end = new Uint8Array(22);
+      writeUint32(end, 0, 0x06054b50);
+      writeUint16(end, 8, files.length);
+      writeUint16(end, 10, files.length);
+      writeUint32(end, 12, centralSize);
+      writeUint32(end, 16, offset);
+      return new Blob([...locals, ...centrals, end], { type: 'application/zip' });
+    }
+
+    function makeSlide(title, bullets, slideNumber) {
+      const bulletXml = bullets.map((bullet, index) => `
+        <a:p>
+          <a:pPr marL="0" indent="0"/>
+          <a:r><a:rPr lang="zh-CN" sz="${index === 0 ? 2800 : 2400}"/><a:t>${escapeXml(bullet)}</a:t></a:r>
+        </a:p>`).join('');
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld>
+    <p:spTree>
+      <p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>
+      <p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>
+      <p:sp>
+        <p:nvSpPr><p:cNvPr id="2" name="Title ${slideNumber}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
+        <p:spPr><a:xfrm><a:off x="548640" y="493680"/><a:ext cx="8046720" cy="914400"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>
+        <p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="zh-CN" sz="4200" b="1"/><a:t>${escapeXml(title)}</a:t></a:r></a:p></p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr><p:cNvPr id="3" name="Content ${slideNumber}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
+        <p:spPr><a:xfrm><a:off x="731520" y="1645920"/><a:ext cx="7680960" cy="3657600"/></a:xfrm><a:prstGeom prst="roundRect"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="F3F6FB"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="DDE4F0"/></a:solidFill></a:ln></p:spPr>
+        <p:txBody><a:bodyPr lIns="274320" tIns="228600" rIns="274320" bIns="228600"/><a:lstStyle/>${bulletXml}</p:txBody>
+      </p:sp>
+    </p:spTree>
+  </p:cSld>
+  <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
+</p:sld>`;
+    }
+
+    function makePptx() {
+      const slides = [
+        ['人工智能导论', ['面向大一学生 · 45 分钟', '案例教学 + 小组互动', '由 A12 教学智能体自动生成']],
+        ['课程目标', ['理解人工智能的基本概念', '识别校园生活中的 AI 应用', '掌握数据、模型、训练、推理的关系']],
+        ['课堂互动', ['四人小组选择校园场景', '画出“数据输入 - 模型判断 - 行动反馈”链路', '讨论 AI 应用的风险与边界']],
+        ['课后任务', ['观察一个常用 App 的智能推荐功能', '分析它可能使用了哪些数据', '提交一页学习反思']]
+      ];
+      const slideFiles = slides.map((slide, index) => ({
+        name: `ppt/slides/slide${index + 1}.xml`,
+        content: makeSlide(slide[0], slide[1], index + 1)
+      }));
+      const slideRels = slides.map((_, index) => `
+    <Relationship Id="rId${index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide${index + 1}.xml"/>`).join('');
+      const slideIds = slides.map((_, index) => `
+      <p:sldId id="${256 + index}" r:id="rId${index + 1}"/>`).join('');
+      const overrides = slides.map((_, index) => `
+  <Override PartName="/ppt/slides/slide${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>`).join('');
+
+      return makeZip([
+        { name: '[Content_Types].xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>${overrides}
+</Types>` },
+        { name: '_rels/.rels', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+</Relationships>` },
+        { name: 'docProps/core.xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>人工智能导论课件</dc:title><dc:creator>A12 教学智能体</dc:creator></cp:coreProperties>` },
+        { name: 'ppt/presentation.xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:sldIdLst>${slideIds}
+  </p:sldIdLst>
+  <p:sldSz cx="9144000" cy="5143500" type="screen16x9"/>
+  <p:notesSz cx="6858000" cy="9144000"/>
+</p:presentation>` },
+        { name: 'ppt/_rels/presentation.xml.rels', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${slideRels}
+</Relationships>` },
+        ...slideFiles
+      ]);
+    }
+
+    function makeDocx() {
+      return makeZip([
+        { name: '[Content_Types].xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>` },
+        { name: '_rels/.rels', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>` },
+        { name: 'word/document.xml', content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>
+<w:p><w:r><w:t>人工智能导论教案</w:t></w:r></w:p>
+<w:p><w:r><w:t>教学目标：帮助大一学生理解人工智能的基本概念、典型应用和基本工作流程。</w:t></w:r></w:p>
+<w:p><w:r><w:t>教学过程：校园案例导入；讲授数据、模型、训练、推理；四人小组互动；总结与作业。</w:t></w:r></w:p>
+<w:p><w:r><w:t>课后作业：选择一个生活中的 AI 应用，分析其输入数据、模型判断和输出结果。</w:t></w:r></w:p>
+</w:body></w:document>` }
+      ]);
+    }
+
+    const gameContent = `<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>课堂互动小游戏</title>
+<body style="font-family: sans-serif; padding: 32px;">
+  <h1>AI 决策链小挑战</h1>
+  <p>四人小组选择一个校园场景，填写：数据输入、模型判断、行动反馈、风险提醒。</p>
+</body>
+</html>`;
+
+    function downloadPptx() {
+      downloadStaticFile('AI_导论课件.pptx');
+      showToast('已下载可打开的 PPTX 文件');
+    }
+
+    function downloadDocx() {
+      downloadStaticFile('AI_导论教案.docx');
+      showToast('已下载完整教案 DOCX');
+    }
+
+    startBtn.addEventListener('click', () => {
+      if (!briefInput.value.trim()) {
+        briefError.hidden = false;
+        briefInput.focus();
+        return;
+      }
+      briefError.hidden = true;
+      showStudio('chat');
+    });
+
+    briefInput.addEventListener('input', () => {
+      if (briefInput.value.trim()) briefError.hidden = true;
+    });
+
+    reviseBtn.addEventListener('click', () => {
+      const request = revisionInput.value.trim();
+      if (!request) {
+        showToast('请输入修改意见');
+        revisionInput.focus();
+        return;
+      }
+      appendBubble(request, 'user');
+      appendBubble('已根据修改意见优化：案例改为校园门禁、学习平台推荐和食堂客流预测；互动小游戏改成 4 人小组协作版本。你可以切到“预览”查看变化，也可以继续提出修改。', 'agent');
+      document.querySelector('#outlineTitle1').textContent = '校园生活中的 AI';
+      document.querySelector('#outlineBody1').textContent = '门禁识别、学习推荐、食堂客流预测';
+      document.querySelector('#outlineTitle2').textContent = 'AI 决策链拆解';
+      document.querySelector('#outlineBody2').textContent = '数据输入、模型判断、行动反馈';
+      document.querySelector('#outlineTitle3').textContent = '4 人小组互动';
+      document.querySelector('#outlineBody3').textContent = '协作完成校园 AI 场景分析小游戏';
+      generationStatus.textContent = '已完成';
+      generationStatusText.textContent = '已生成新版 PPT、Word 教案、小游戏方案';
+      reviseBtn.textContent = '已优化';
+      showToast('修改已应用到课件预览');
+      setTimeout(() => setPanel('preview'), 650);
+      setTimeout(() => {
+        reviseBtn.textContent = '修改';
+      }, 1600);
+    });
+
+    backBtn.addEventListener('click', () => {
+      showScreen('home');
+    });
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        setPanel(tab.dataset.panel);
+      });
+    });
+
+    productPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        productPills.forEach(item => item.classList.remove('active'));
+        pill.classList.add('active');
+        const config = productPrompts[pill.dataset.product];
+        if (config) {
+          briefInput.value = config.brief;
+          if (briefError) briefError.hidden = true;
+          showToast(config.toast);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-voice-target]').forEach(button => {
+      button.addEventListener('click', () => {
+        const target = button.dataset.voiceTarget === 'revision' ? revisionInput : briefInput;
+        const text = button.dataset.voiceTarget === 'revision'
+          ? '请把第三部分改成校园学习平台推荐案例，并补充一个课堂提问。'
+          : '请生成一节 45 分钟的人工智能导论课，面向大一学生，要求案例来自校园生活。';
+        target.value = text;
+        target.focus();
+        showToast('已模拟语音识别并填入文本');
+      });
+    });
+
+    document.querySelectorAll('[data-upload-trigger]').forEach(button => {
+      button.addEventListener('click', () => fileInput.click());
+    });
+
+    fileInput.addEventListener('change', () => {
+      const files = [...fileInput.files];
+      if (!files.length) return;
+      if (uploadedEmpty) uploadedEmpty.hidden = true;
+      uploadedFiles.innerHTML = files.map(file => `
+        <div class="file-row">
+          <div class="file-ico rag">${escapeHtml(file.name.split('.').pop().slice(0, 3).toUpperCase())}</div>
+          <div><h3>${escapeHtml(file.name)}</h3><p>已加入项目资料，等待 Pi Agent 解析</p></div>
+          <span class="small">${Math.max(1, Math.round(file.size / 1024))}K</span>
+        </div>
+      `).join('');
+      showToast(`已添加 ${files.length} 个参考资料`);
+      fileInput.value = '';
+      showStudio('files');
+    });
+
+    document.querySelectorAll('[data-template]').forEach(card => {
+      card.addEventListener('click', () => {
+        if (card.dataset.template === 'intro') {
+          briefInput.value = productPrompts.ppt.brief;
+          showStudio('chat');
+          showToast('已套用导论课共创模板');
+        }
+        if (card.dataset.template === 'lesson-plan') {
+          productPills.forEach(item => item.classList.toggle('active', item.dataset.product === 'doc'));
+          briefInput.value = productPrompts.doc.brief;
+          showToast('已切换到 Word 教案模板');
+        }
+        if (card.dataset.template === 'materials') {
+          showScreen('knowledge');
+          showToast('已进入资料融合与知识库页面');
+        }
+      });
+    });
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => showScreen(item.dataset.nav));
+    });
+
+    document.querySelectorAll('[data-open-studio]').forEach(item => {
+      item.addEventListener('click', () => showStudio('preview'));
+    });
+
+    document.querySelectorAll('[data-open-screen]').forEach(item => {
+      item.addEventListener('click', () => showScreen(item.dataset.openScreen));
+    });
+
+    document.querySelectorAll('[data-open-panel]').forEach(item => {
+      item.addEventListener('click', () => showStudio(item.dataset.openPanel));
+    });
+
+    desktopModeButtons.forEach(button => {
+      button.addEventListener('click', () => setDesktopMode(button.dataset.desktopMode));
+    });
+
+    document.querySelectorAll('[data-desktop-add]').forEach(button => {
+      button.addEventListener('click', () => {
+        showScreen('knowledge');
+        showDesktopFeedback('已打开资料库，可上传 PDF、Word、PPT、图片或视频。');
+        showToast('已进入资料上传与知识库页面');
+      });
+    });
+
+    document.querySelectorAll('[data-desktop-run]').forEach(button => {
+      button.addEventListener('click', () => {
+        desktopStatus.textContent = 'exporting';
+        showStudio('preview');
+        showDesktopFeedback('Pi Agent 已生成完整课堂包，正在导出 PPTX、DOCX 和互动方案。');
+        setTimeout(() => {
+          downloadPptx();
+          downloadDocx();
+          downloadStaticFile('课堂互动小游戏.html');
+          desktopStatus.textContent = 'exported';
+          showDesktopFeedback('完整课堂包已导出。');
+        }, 260);
+      });
+    });
+
+    sampleCards.forEach(card => {
+      card.addEventListener('click', () => {
+        sampleCards.forEach(item => item.classList.remove('active'));
+        card.classList.add('active');
+        const label = card.querySelector('strong')?.textContent || '示例产物';
+        showDesktopFeedback(`已选择 ${label}，下载动作已触发。`);
+      });
+    });
+
+    document.querySelectorAll('[data-toast]').forEach(item => {
+      item.addEventListener('click', () => showToast(item.dataset.toast));
+    });
+
+    document.querySelectorAll('[role="button"][tabindex="0"]').forEach(item => {
+      item.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          item.click();
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-download]').forEach(button => {
+      button.addEventListener('click', () => {
+        if (button.dataset.download === 'pptx') downloadPptx();
+        if (button.dataset.download === 'docx') downloadDocx();
+        if (button.dataset.download === 'all') {
+          downloadPptx();
+          downloadDocx();
+          downloadStaticFile('课堂互动小游戏.html');
+          showToast('已导出 PPTX、DOCX 和互动小游戏');
+        }
+      });
+    });
+
+    const demoBackground = document.querySelector('.demo-bg');
+    const particleLayer = document.querySelector('.demo-particles');
+    const demoArea = document.querySelector('#demo');
+
+    if (particleLayer) {
+      for (let i = 0; i < 16; i += 1) {
+        const particle = document.createElement('span');
+        particle.className = 'particle';
+        particle.style.setProperty('--left', `${Math.random() * 100}%`);
+        particle.style.setProperty('--size', `${2 + Math.random() * 6}px`);
+        particle.style.setProperty('--duration', `${18 + Math.random() * 22}s`);
+        particle.style.setProperty('--delay', `${-Math.random() * 32}s`);
+        particle.style.setProperty('--drift', `${(Math.random() - 0.5) * 180}px`);
+        particleLayer.appendChild(particle);
+      }
+    }
+
+    if (demoArea && demoBackground && window.matchMedia('(pointer: fine)').matches) {
+      demoArea.addEventListener('pointermove', event => {
+        const rect = demoArea.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+        demoBackground.style.setProperty('--parallax-x', `${x * -22}px`);
+        demoBackground.style.setProperty('--parallax-y', `${y * -16}px`);
+      });
+
+      demoArea.addEventListener('pointerleave', () => {
+        demoBackground.style.setProperty('--parallax-x', '0px');
+        demoBackground.style.setProperty('--parallax-y', '0px');
+      });
+    }
+
+  </script>
+</body>
+</html>
