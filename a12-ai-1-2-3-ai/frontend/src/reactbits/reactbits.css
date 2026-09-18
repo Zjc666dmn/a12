@@ -1,0 +1,80 @@
+.rb-spotlight-card {
+  position: relative;
+  overflow: hidden;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(110, 174, 255, .22);
+}
+
+.rb-spotlight-card::before {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle 150px at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 78%);
+  transition: opacity .45s ease;
+}
+
+.rb-spotlight-card:hover::before,
+.rb-spotlight-card:focus-within::before { opacity: 1; }
+.rb-spotlight-card > * { position: relative; z-index: 2; }
+
+.rb-glare-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.rb-glare-hover::before {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(var(--rb-glare-angle), transparent 58%, var(--rb-glare-color) 69%, transparent 81%);
+  background-position: -100% -100%;
+  background-repeat: no-repeat;
+  background-size: var(--rb-glare-size) var(--rb-glare-size);
+  transition: background-position var(--rb-glare-duration) ease;
+}
+
+.rb-glare-hover:hover::before { background-position: 100% 100%; }
+
+.rb-star-border {
+  position: relative;
+  display: inline-grid;
+  padding: 1px;
+  place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+}
+
+.rb-star-bottom,
+.rb-star-top {
+  position: absolute;
+  z-index: 0;
+  width: 300%;
+  height: 55%;
+  opacity: .72;
+  border-radius: 50%;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.rb-star-bottom { right: -250%; bottom: -10px; animation-name: rb-star-bottom; }
+.rb-star-top { top: -10px; left: -250%; animation-name: rb-star-top; }
+.rb-star-content { position: relative; z-index: 1; display: grid; place-items: center; }
+
+@keyframes rb-star-bottom { to { opacity: 0; transform: translateX(-100%); } }
+@keyframes rb-star-top { to { opacity: 0; transform: translateX(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-star-bottom,
+  .rb-star-top { animation: none; }
+  .rb-glare-hover::before { transition: none; }
+}
