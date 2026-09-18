@@ -1,0 +1,32 @@
+{
+  "id": "presenton-general",
+  "name": "通用简约",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "decor": "wave",
+  "dark": false,
+  "description": "Presenton General：蓝色主调、大留白、结构清晰，适合通用课堂",
+  "colors": {
+    "background": "9333EA",
+    "surface": "FFFFFF",
+    "primary": "3B82F6",
+    "primarySoft": "A855F7",
+    "text": "111827",
+    "muted": "4B5563",
+    "line": "E5E7EB",
+    "accent": "3B82F6"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton General"
+}

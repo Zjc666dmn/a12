@@ -1,0 +1,32 @@
+{
+  "id": "presenton-executive",
+  "name": "商务紫韵",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "decor": "grid",
+  "dark": false,
+  "description": "Presenton Executive：紫色商务风、结构严谨，适合教研与说课",
+  "colors": {
+    "background": "F8F7FB",
+    "surface": "F0EEF8",
+    "primary": "8554EB",
+    "primarySoft": "6354A3",
+    "text": "FFFFFF",
+    "muted": "F0EEF8",
+    "line": "9081C8",
+    "accent": "8554EB"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Executive"
+}

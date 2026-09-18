@@ -1,0 +1,32 @@
+{
+  "id": "presenton-modern",
+  "name": "现代活力",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "decor": "circle",
+  "dark": false,
+  "description": "Presenton Modern：橙蓝撞色、卡片式布局，适合活泼的导入与互动页",
+  "colors": {
+    "background": "F5F8FE",
+    "surface": "FFFFFF",
+    "primary": "F59E0B",
+    "primarySoft": "E4EAF3",
+    "text": "334155",
+    "muted": "6B7280",
+    "line": "E5E7EB",
+    "accent": "F59E0B"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Modern"
+}

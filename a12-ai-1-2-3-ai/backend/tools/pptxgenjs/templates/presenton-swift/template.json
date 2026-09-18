@@ -1,0 +1,32 @@
+{
+  "id": "presenton-swift",
+  "name": "轻盈青蓝",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "decor": "circle",
+  "dark": false,
+  "description": "Presenton Swift：明亮青蓝、节奏轻快，适合复习与速讲",
+  "colors": {
+    "background": "BFF4FF",
+    "surface": "111827",
+    "primary": "BDEFF8",
+    "primarySoft": "6B7280",
+    "text": "111827",
+    "muted": "E198F4",
+    "line": "E5E7EB",
+    "accent": "BDEFF8"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Swift"
+}

@@ -1,0 +1,129 @@
+{
+  "id": "magazine-editorial",
+  "name": "杂志编辑",
+  "version": 2,
+  "generation": 2,
+  "category": "creative",
+  "description": "超大标题、不规则排版与大面积图片位，杂志式文字，适合专题与人文课程。",
+  "suitable": [
+    "专题课",
+    "人文社科",
+    "阅读写作",
+    "班会"
+  ],
+  "tags": [
+    "专题课",
+    "人文社科",
+    "阅读写作"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "FFFFFF",
+      "surface": "FFFFFF",
+      "surfaceAlt": "F1EFE9",
+      "primary": "1A1A1A",
+      "primarySoft": "E4E1D8",
+      "accent": "E4572E",
+      "accentSoft": "FBE3DA",
+      "text": "141414",
+      "muted": "6E6A62",
+      "line": "D6D2C8",
+      "onPrimary": "FFFFFF",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "Heiti SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.02,
+      "button": 0.05,
+      "image": 0.0
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.62,
+      "gap": 0.26
+    },
+    "type": {
+      "cover": 54,
+      "section": 40,
+      "head": 32,
+      "sub": 18,
+      "body": 15,
+      "micro": 10,
+      "metric": 44,
+      "quote": 30
+    },
+    "ornament": "corner-fold",
+    "cardStyle": "hard",
+    "titleStyle": "boxed",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-magazine",
+    "agenda": "agenda-grid",
+    "section": "section-side",
+    "content": [
+      "content-columns",
+      "content-stack"
+    ],
+    "cards": [
+      "cards-mosaic"
+    ],
+    "case": [
+      "case-card"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-grid"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-full"
+    ],
+    "table": [
+      "table-split"
+    ],
+    "timeline": [
+      "timeline-rail"
+    ],
+    "process": [
+      "process-steps"
+    ],
+    "compare": [
+      "compare-split"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

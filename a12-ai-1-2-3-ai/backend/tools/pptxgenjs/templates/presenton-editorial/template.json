@@ -1,0 +1,32 @@
+{
+  "id": "presenton-editorial",
+  "name": "杂志编辑",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "Songti SC",
+  "decor": "rect",
+  "dark": true,
+  "description": "Presenton Editorial：杂志风排版、衬线标题，适合人文与阅读课",
+  "colors": {
+    "background": "1D242D",
+    "surface": "1DA1F2",
+    "primary": "155F99",
+    "primarySoft": "FFFFFF",
+    "text": "FFFFFF",
+    "muted": "B9C0CC",
+    "line": "FFFFFF",
+    "accent": "155F99"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Editorial"
+}

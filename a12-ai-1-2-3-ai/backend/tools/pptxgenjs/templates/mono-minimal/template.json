@@ -1,0 +1,129 @@
+{
+  "id": "mono-minimal",
+  "name": "黑白极简",
+  "version": 2,
+  "generation": 2,
+  "category": "creative",
+  "description": "黑白灰、超大字号、极少装饰，用排版本身制造张力，适合概念讲授。",
+  "suitable": [
+    "概念课",
+    "思辨课",
+    "公开课",
+    "教师培训"
+  ],
+  "tags": [
+    "概念课",
+    "思辨课",
+    "公开课"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "FFFFFF",
+      "surface": "FFFFFF",
+      "surfaceAlt": "F2F2F2",
+      "primary": "111111",
+      "primarySoft": "E2E2E2",
+      "accent": "8A8A8A",
+      "accentSoft": "EDEDED",
+      "text": "111111",
+      "muted": "8A8A8A",
+      "line": "DADADA",
+      "onPrimary": "FFFFFF",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "Heiti SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.0,
+      "button": 0.0,
+      "image": 0.0
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.9,
+      "gap": 0.4
+    },
+    "type": {
+      "cover": 58,
+      "section": 44,
+      "head": 34,
+      "sub": 20,
+      "body": 16,
+      "micro": 11,
+      "metric": 52,
+      "quote": 32
+    },
+    "ornament": "minimal",
+    "cardStyle": "outline",
+    "titleStyle": "center",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-centered",
+    "agenda": "agenda-index",
+    "section": "section-full",
+    "content": [
+      "content-lead",
+      "content-stack"
+    ],
+    "cards": [
+      "cards-row"
+    ],
+    "case": [
+      "case-brief"
+    ],
+    "activity": [
+      "activity-steps"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-hero"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-full"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-vertical"
+    ],
+    "process": [
+      "process-steps"
+    ],
+    "compare": [
+      "compare-split"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

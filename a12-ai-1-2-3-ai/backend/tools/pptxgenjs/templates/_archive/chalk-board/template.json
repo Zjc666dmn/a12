@@ -1,0 +1,32 @@
+{
+  "id": "chalk-board",
+  "name": "板书粉笔",
+  "series": "teachnova",
+  "ratio": "16:9",
+  "font": "Kaiti SC",
+  "decor": "none",
+  "dark": true,
+  "description": "深灰板书底 + 手写楷体，还原教室黑板质感，适合理科推演与例题演算",
+  "colors": {
+    "background": "2E3238",
+    "surface": "3A3F46",
+    "primary": "F2C94C",
+    "primarySoft": "454B52",
+    "text": "F5F5F5",
+    "muted": "B7BCC3",
+    "line": "5A6068",
+    "accent": "7ED957"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · 板书课堂"
+}

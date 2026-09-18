@@ -112,11 +112,26 @@ def _write_page_plan(workspace: Path, task: CourseTask, plan: dict[str, Any]) ->
 
 def _write_svg_roster(workspace: Path, task: CourseTask, plan: dict[str, Any]) -> None:
     output_dir = workspace / "svg_output"
-    for path in output_dir.glob("P*.svg"):
-        path.unlink()
-    for index, slide in enumerate(_slide_roster(task, plan), 1):
-        svg = _render_slide_svg(slide, index, len(_slide_roster(task, plan)))
+    for path in sorted(output_dir.glob("P*.svg")):
+        try:
+            path.unlink()
+        except OSError:
+            # macOS TCC may deny unlinking files under ~/Downloads even when
+            # writing is allowed. Page filenames are deterministic, so stale
+            # pages are simply overwritten below.
+            pass
+    roster = _slide_roster(task, plan)
+    for index, slide in enumerate(roster, 1):
+        svg = _render_slide_svg(slide, index, len(roster))
         (output_dir / f"P{index:02d}.svg").write_text(svg, encoding="utf-8")
+    # Drop leftover higher-numbered pages (e.g. when the plan shrinks); this is
+    # best-effort for the same TCC reason as above.
+    for path in sorted(output_dir.glob("P*.svg")):
+        if int(path.stem[1:]) > len(roster):
+            try:
+                path.unlink()
+            except OSError:
+                path.write_text("", encoding="utf-8")
 
 
 def _slide_roster(task: CourseTask, plan: dict[str, Any]) -> list[dict[str, Any]]:
@@ -171,15 +186,28 @@ def _render_slide_svg(slide: dict[str, Any], index: int, total: int) -> str:
     bullets = [str(item) for item in slide.get("bullets", [])][:6]
     side = escape(_truncate(str(slide.get("side") or "课堂讲解"), 8))
     page_role = "cover" if index == 1 else "ending" if index == total else "content"
+    # The body container (70,195)-(830,555) fits ~30 chars per 24px line; the old
+    # 52-char single-line truncation overflowed it and failed the SVG quality
+    # gate. Wrap each bullet to at most 2 lines of 28 chars instead, capping the
+    # page at 6 rendered lines so text never leaves the container.
+    lines: list[tuple[str, bool]] = []
+    for item in bullets:
+        for line_index, chunk in enumerate(_wrap_text(item, width=28, max_lines=2)):
+            if len(lines) >= 6:
+                break
+            lines.append((chunk, line_index == 0))
+        if len(lines) >= 6:
+            break
     body = "".join(
         f'<text x="112" y="{235 + offset * 54}" '
         'style="font-family:Arial, Noto Sans CJK SC, sans-serif;font-size:24;fill:#24344D">'
-        f'{escape(_truncate(item, 52))}</text>'
-        for offset, item in enumerate(bullets)
+        f'{escape(text)}</text>'
+        for offset, (text, _starts_bullet) in enumerate(lines)
     )
     markers = "".join(
         f'<circle cx="80" cy="{228 + offset * 54}" r="7" fill="#4F7CFF" />'
-        for offset in range(len(bullets))
+        for offset, (_text, starts_bullet) in enumerate(lines)
+        if starts_bullet
     )
     return f'''<svg xmlns="http://www.w3.org/2000/svg" lang="zh-CN" viewBox="0 0 {CANVAS_WIDTH} {CANVAS_HEIGHT}" data-pptx-page-role="{page_role}">
   <rect id="background" width="1280" height="720" fill="#F6FAFF" data-pptx-role="background" />
@@ -202,6 +230,20 @@ def _render_slide_svg(slide: dict[str, Any], index: int, total: int) -> str:
 def _truncate(value: str, limit: int) -> str:
     normalized = re.sub(r"\s+", " ", value).strip()
     return normalized if len(normalized) <= limit else normalized[: limit - 1] + "…"
+
+
+def _wrap_text(value: str, *, width: int, max_lines: int) -> list[str]:
+    normalized = re.sub(r"\s+", " ", value).strip()
+    if not normalized:
+        return []
+    if len(normalized) <= width:
+        return [normalized]
+    lines = [normalized[:width]]
+    rest = normalized[width:]
+    if len(rest) > width - 1:
+        rest = rest[: width - 2] + "…"
+    lines.append(rest)
+    return lines[:max_lines]
 
 
 def _run(command: list[str], *, cwd: Path, label: str) -> None:

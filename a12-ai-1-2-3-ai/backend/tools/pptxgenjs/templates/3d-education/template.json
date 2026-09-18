@@ -1,0 +1,130 @@
+{
+  "id": "3d-education",
+  "name": "3D 教育",
+  "version": 2,
+  "generation": 2,
+  "category": "education",
+  "description": "立体卡片、悬浮元素与空间层次，配合贴纸式装饰，适合知识点拆解。",
+  "suitable": [
+    "知识点拆解",
+    "重难点突破",
+    "互动课"
+  ],
+  "tags": [
+    "知识点拆解",
+    "重难点突破",
+    "互动课"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "F4F7FB",
+      "surface": "FFFFFF",
+      "surfaceAlt": "E7EEF9",
+      "primary": "4C6FFF",
+      "primarySoft": "DCE6FF",
+      "accent": "FFB020",
+      "accentSoft": "FFF0D6",
+      "text": "1C2434",
+      "muted": "6E7A90",
+      "line": "CBD7EC",
+      "onPrimary": "FFFFFF",
+      "onAccent": "3A2A00"
+    },
+    "fonts": {
+      "heading": "Heiti SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.1,
+      "button": 0.34,
+      "image": 0.14
+    },
+    "shadow": {
+      "enabled": true,
+      "opacity": 0.18,
+      "offset": 3,
+      "blur": 10,
+      "color": "1B2A55"
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 42,
+      "section": 36,
+      "head": 28,
+      "sub": 18,
+      "body": 15,
+      "micro": 10,
+      "metric": 40,
+      "quote": 26
+    },
+    "ornament": "sticker",
+    "cardStyle": "hard",
+    "titleStyle": "boxed",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-split",
+    "agenda": "agenda-grid",
+    "section": "section-number",
+    "content": [
+      "content-columns",
+      "content-sidebar"
+    ],
+    "cards": [
+      "cards-mosaic",
+      "cards-grid"
+    ],
+    "case": [
+      "case-card"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-left"
+    ],
+    "metrics": [
+      "metrics-grid"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-side"
+    ],
+    "table": [
+      "table-split"
+    ],
+    "timeline": [
+      "timeline-axis"
+    ],
+    "process": [
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-columns"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

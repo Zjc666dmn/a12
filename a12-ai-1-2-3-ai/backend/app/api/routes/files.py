@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -13,12 +13,18 @@ from app.services.document_parser import parse_document
 
 router = APIRouter()
 
-ALLOWED_EXTENSIONS = {".pdf", ".doc", ".docx", ".pptx"}
+ALLOWED_EXTENSIONS = {".pdf", ".doc", ".docx", ".pptx", ".png", ".jpg", ".jpeg", ".webp", ".mp4", ".mov", ".webm"}
 ALLOWED_CONTENT_TYPES = {
     "application/pdf",
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+    "video/mp4",
+    "video/quicktime",
+    "video/webm",
 }
 
 
@@ -29,11 +35,11 @@ def _validate_upload_file(file: UploadFile) -> str:
     filename = Path(file.filename).name
     extension = Path(filename).suffix.lower()
     if extension not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail="仅支持上传 PDF、Word（.doc/.docx）和 PPT（.pptx）文件")
+        raise HTTPException(status_code=400, detail="支持 PDF、Word、PPT、PNG/JPG/WebP 图片和 MP4/MOV/WebM 视频")
 
     content_type = file.content_type or "application/octet-stream"
     if content_type not in ALLOWED_CONTENT_TYPES:
-        raise HTTPException(status_code=400, detail="文件类型不受支持，请上传 PDF、Word 或 PPT 文件")
+        raise HTTPException(status_code=400, detail="文件类型不受支持，请上传教学文档、图片或视频")
 
     return filename
 
@@ -51,6 +57,8 @@ def _save_upload_file(file: UploadFile, destination: Path) -> int:
 def upload_task_file(
     task_id: int,
     file: UploadFile = File(...),
+    purpose: str = Form("content"),
+    focus: str = Form(""),
     db: Session = Depends(get_db),
 ) -> FileRead:
     task = db.get(CourseTask, task_id)
@@ -58,6 +66,8 @@ def upload_task_file(
         raise HTTPException(status_code=404, detail="Task not found")
 
     filename = _validate_upload_file(file)
+    if purpose not in {"content", "style", "case", "activity"}:
+        raise HTTPException(status_code=422, detail="不支持的资料用途")
 
     task_dir = settings.uploads_dir / str(task_id)
     task_dir.mkdir(parents=True, exist_ok=True)
@@ -70,6 +80,8 @@ def upload_task_file(
         file_name=filename,
         file_type=file.content_type or "application/octet-stream",
         file_path=str(destination),
+        purpose=purpose,
+        focus=focus.strip()[:500] or None,
         parse_status="pending",
     )
     db.add(record)

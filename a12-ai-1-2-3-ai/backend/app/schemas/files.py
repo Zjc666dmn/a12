@@ -9,6 +9,8 @@ class FileRead(BaseModel):
     file_name: str
     file_type: str
     file_path: str
+    purpose: str = "content"
+    focus: str | None = None
     parse_status: str
     parsed_content: str | None
     created_at: datetime

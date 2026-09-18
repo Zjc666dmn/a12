@@ -1,0 +1,32 @@
+{
+  "id": "kids-sunshine",
+  "name": "童趣阳光",
+  "series": "teachnova",
+  "ratio": "16:9",
+  "font": "Yuanti SC",
+  "decor": "grid",
+  "dark": false,
+  "description": "明亮暖色 + 圆角卡片 + 圆体字，适合小学与低年级启蒙课堂",
+  "colors": {
+    "background": "FFF9F0",
+    "surface": "FFFFFF",
+    "primary": "FF8A3D",
+    "primarySoft": "FFE7CF",
+    "text": "3A2E28",
+    "muted": "948680",
+    "line": "F2DCC6",
+    "accent": "4CAF93"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 40,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 16,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · 童趣课堂"
+}

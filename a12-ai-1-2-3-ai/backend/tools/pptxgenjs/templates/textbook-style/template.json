@@ -1,0 +1,129 @@
+{
+  "id": "textbook-style",
+  "name": "教材风",
+  "version": 2,
+  "generation": 2,
+  "category": "education",
+  "description": "教材版式、知识框、章节编号与重点标记，最贴近中小学课堂的阅读习惯。",
+  "suitable": [
+    "中小学课堂",
+    "同步教学",
+    "单元复习",
+    "考点梳理"
+  ],
+  "tags": [
+    "中小学课堂",
+    "同步教学",
+    "单元复习"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "FFFFFF",
+      "surface": "FFFFFF",
+      "surfaceAlt": "F1F6F4",
+      "primary": "1F7A5C",
+      "primarySoft": "DCEFE7",
+      "accent": "D9534F",
+      "accentSoft": "FBE3E2",
+      "text": "22303A",
+      "muted": "6E7C86",
+      "line": "CFE0D9",
+      "onPrimary": "FFFFFF",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "Heiti SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.06,
+      "button": 0.24,
+      "image": 0.06
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 42,
+      "section": 36,
+      "head": 29,
+      "sub": 18,
+      "body": 16,
+      "micro": 11,
+      "metric": 38,
+      "quote": 26
+    },
+    "ornament": "edge-block",
+    "cardStyle": "tinted",
+    "titleStyle": "number",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-classic",
+    "agenda": "agenda-list",
+    "section": "section-side",
+    "content": [
+      "content-stack",
+      "content-lead"
+    ],
+    "cards": [
+      "cards-stack"
+    ],
+    "case": [
+      "case-brief"
+    ],
+    "activity": [
+      "activity-steps"
+    ],
+    "quote": [
+      "quote-left"
+    ],
+    "metrics": [
+      "metrics-row"
+    ],
+    "summary": [
+      "summary-map"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-side"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-vertical"
+    ],
+    "process": [
+      "process-steps"
+    ],
+    "compare": [
+      "compare-table"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

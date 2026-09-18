@@ -1,0 +1,32 @@
+{
+  "id": "education-tech",
+  "name": "教育科技",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "description": "深蓝渐变头部条、白底内容区，适合信息化课堂演示",
+  "colors": {
+    "background": "FFFFFF",
+    "surface": "F0F5FF",
+    "primary": "2456D6",
+    "primarySoft": "D6E4FF",
+    "text": "1B2437",
+    "muted": "6B7A94",
+    "line": "B9CDF0",
+    "accent": "FF8A3D"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 40,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · 智能课堂",
+  "series": "teachnova",
+  "decor": "wave",
+  "dark": false
+}

@@ -1,0 +1,131 @@
+{
+  "id": "glass-morphism",
+  "name": "玻璃拟态",
+  "version": 2,
+  "generation": 2,
+  "category": "tech",
+  "description": "半透明玻璃卡片、柔光渐变与柔和阴影，层次通透，与 TeachNova 品牌调性一致。",
+  "suitable": [
+    "品牌课件",
+    "公开示范课",
+    "教学设计",
+    "教研分享"
+  ],
+  "tags": [
+    "品牌课件",
+    "公开示范课",
+    "教学设计"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "EEF2FF",
+      "surface": "FFFFFF",
+      "surfaceAlt": "E3E9FF",
+      "primary": "5B6CFF",
+      "primarySoft": "DCE0FF",
+      "accent": "FF7AB8",
+      "accentSoft": "FFE1EF",
+      "text": "1E2340",
+      "muted": "737BA0",
+      "line": "C9CFF5",
+      "onPrimary": "FFFFFF",
+      "onAccent": "3A1030"
+    },
+    "fonts": {
+      "heading": "PingFang SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.26,
+      "button": 0.4,
+      "image": 0.2
+    },
+    "shadow": {
+      "enabled": true,
+      "opacity": 0.16,
+      "offset": 3,
+      "blur": 12,
+      "color": "2B2F6B"
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 42,
+      "section": 36,
+      "head": 28,
+      "sub": 18,
+      "body": 15,
+      "micro": 10,
+      "metric": 40,
+      "quote": 26
+    },
+    "ornament": "glass-orb",
+    "cardStyle": "glass",
+    "titleStyle": "boxed",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-classic",
+    "agenda": "agenda-grid",
+    "section": "section-number",
+    "content": [
+      "content-sidebar",
+      "content-lead"
+    ],
+    "cards": [
+      "cards-grid",
+      "cards-row"
+    ],
+    "case": [
+      "case-brief"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-left"
+    ],
+    "metrics": [
+      "metrics-row"
+    ],
+    "summary": [
+      "summary-map"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-side"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-axis"
+    ],
+    "process": [
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-columns"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": true,
+    "avoidRepeat": true
+  }
+}

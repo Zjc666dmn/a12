@@ -1,0 +1,32 @@
+{
+  "id": "ink-chinese",
+  "name": "水墨语文",
+  "series": "teachnova",
+  "ratio": "16:9",
+  "font": "Songti SC",
+  "decor": "wave",
+  "dark": false,
+  "description": "宣纸米底 + 墨色衬线标题，留白讲究，适合语文、历史与人文主题",
+  "colors": {
+    "background": "FBF7F0",
+    "surface": "FFFFFF",
+    "primary": "8C5A3C",
+    "primarySoft": "EFE3D6",
+    "text": "2B2622",
+    "muted": "8A7F74",
+    "line": "DCCFC0",
+    "accent": "A63D40"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · 人文课堂"
+}

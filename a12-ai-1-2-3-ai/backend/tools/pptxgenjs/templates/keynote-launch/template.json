@@ -1,0 +1,129 @@
+{
+  "id": "keynote-launch",
+  "name": "产品发布",
+  "version": 2,
+  "generation": 2,
+  "category": "tech",
+  "description": "深色满版、巨大标题与超大产品图位，极少文字，空间感强，适合成果展示。",
+  "suitable": [
+    "成果汇报",
+    "项目展示",
+    "竞赛答辩",
+    "产品介绍"
+  ],
+  "tags": [
+    "成果汇报",
+    "项目展示",
+    "竞赛答辩"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": true,
+  "designSystem": {
+    "colors": {
+      "background": "000000",
+      "surface": "0F0F0F",
+      "surfaceAlt": "1C1C1E",
+      "primary": "F5F5F7",
+      "primarySoft": "2C2C2E",
+      "accent": "2997FF",
+      "accentSoft": "123A5E",
+      "text": "F5F5F7",
+      "muted": "8E8E93",
+      "line": "2C2C2E",
+      "onPrimary": "000000",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "PingFang SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.12,
+      "button": 0.3,
+      "image": 0.16
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 52,
+      "section": 42,
+      "head": 32,
+      "sub": 20,
+      "body": 16,
+      "micro": 11,
+      "metric": 56,
+      "quote": 30
+    },
+    "ornament": "neon-line",
+    "cardStyle": "flat",
+    "titleStyle": "rule",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "dark"
+    }
+  },
+  "layouts": {
+    "cover": "cover-fullbleed",
+    "agenda": "agenda-index",
+    "section": "section-full",
+    "content": [
+      "content-stack",
+      "content-lead"
+    ],
+    "cards": [
+      "cards-row"
+    ],
+    "case": [
+      "case-card"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-hero"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-cta"
+    ],
+    "chart": [
+      "chart-full"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-rail"
+    ],
+    "process": [
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-split"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

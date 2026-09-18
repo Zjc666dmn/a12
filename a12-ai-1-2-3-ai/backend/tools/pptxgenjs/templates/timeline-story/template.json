@@ -1,0 +1,130 @@
+{
+  "id": "timeline-story",
+  "name": "时间轴故事",
+  "version": 2,
+  "generation": 2,
+  "category": "creative",
+  "description": "大年份、有机曲线与图片位，用时间线讲知识的发展脉络。",
+  "suitable": [
+    "历史课",
+    "科学史",
+    "人物传记",
+    "单元导入"
+  ],
+  "tags": [
+    "历史课",
+    "科学史",
+    "人物传记"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "FFFDF7",
+      "surface": "FFFFFF",
+      "surfaceAlt": "F5EFE6",
+      "primary": "B45309",
+      "primarySoft": "F6E6CE",
+      "accent": "0E7490",
+      "accentSoft": "D5EEF3",
+      "text": "2B2419",
+      "muted": "7C7365",
+      "line": "E0D5C3",
+      "onPrimary": "FFFFFF",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "Songti SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.2,
+      "button": 0.36,
+      "image": 0.16
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 44,
+      "section": 38,
+      "head": 29,
+      "sub": 18,
+      "body": 15,
+      "micro": 10,
+      "metric": 42,
+      "quote": 28
+    },
+    "ornament": "organic-curve",
+    "cardStyle": "glass",
+    "titleStyle": "underline",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-split",
+    "agenda": "agenda-index",
+    "section": "section-side",
+    "content": [
+      "content-lead",
+      "content-sidebar"
+    ],
+    "cards": [
+      "cards-row"
+    ],
+    "case": [
+      "case-brief"
+    ],
+    "activity": [
+      "activity-steps"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-row"
+    ],
+    "summary": [
+      "summary-map"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-side"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-rail",
+      "timeline-vertical"
+    ],
+    "process": [
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-columns"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

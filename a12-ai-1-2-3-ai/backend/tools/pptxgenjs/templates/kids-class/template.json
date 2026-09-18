@@ -1,0 +1,130 @@
+{
+  "id": "kids-class",
+  "name": "儿童课堂",
+  "version": 2,
+  "generation": 2,
+  "category": "education",
+  "description": "大色块、超大圆角、贴纸与卡通角色位，适合幼儿与小学低年级。",
+  "suitable": [
+    "幼儿教育",
+    "小学低年级",
+    "绘本阅读",
+    "启蒙课"
+  ],
+  "tags": [
+    "幼儿教育",
+    "小学低年级",
+    "绘本阅读"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "FFF7EE",
+      "surface": "FFFFFF",
+      "surfaceAlt": "FFE9D2",
+      "primary": "FF8A3D",
+      "primarySoft": "FFE2CC",
+      "accent": "34C3A6",
+      "accentSoft": "D6F5EE",
+      "text": "33291F",
+      "muted": "857768",
+      "line": "F3D9BE",
+      "onPrimary": "FFFFFF",
+      "onAccent": "04382F"
+    },
+    "fonts": {
+      "heading": "Heiti SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.3,
+      "button": 0.5,
+      "image": 0.24
+    },
+    "shadow": {
+      "enabled": true,
+      "opacity": 0.1,
+      "offset": 3,
+      "blur": 6,
+      "color": "8A5A2A"
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 48,
+      "section": 38,
+      "head": 32,
+      "sub": 20,
+      "body": 17,
+      "micro": 12,
+      "metric": 42,
+      "quote": 28
+    },
+    "ornament": "sticker",
+    "cardStyle": "flat",
+    "titleStyle": "boxed",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-split",
+    "agenda": "agenda-grid",
+    "section": "section-number",
+    "content": [
+      "content-stack",
+      "content-columns"
+    ],
+    "cards": [
+      "cards-row"
+    ],
+    "case": [
+      "case-card"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-left"
+    ],
+    "metrics": [
+      "metrics-row"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-side"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-axis"
+    ],
+    "process": [
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-columns"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

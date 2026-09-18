@@ -100,8 +100,8 @@ def _mimo_config(api_key: str = "") -> str:
         {
             "env": {
                 "MIMO_API_KEY": api_key,
-                "MIMO_BASE_URL": "https://token-plan-cn.xiaomimimo.com/api/v1",
-                "MIMO_MODEL": "mimo-chat",
+                "MIMO_BASE_URL": "https://api.xiaomimimo.com/v1",
+                "MIMO_MODEL": "mimo-v2.5-pro",
             },
             "provider": "xiaomi-mimo",
             "apiFormat": "openai-compatible",
@@ -230,11 +230,11 @@ def _default_models() -> list[dict[str, Any]]:
         {
             "id": "mimo",
             "provider": "Xiaomi MiMo",
-            "remark": "小米 MiMo 模型配置",
-            "website": "https://token-plan-cn.xiaomimimo.com/api",
+            "remark": "小米 MiMo 推理模型",
+            "website": "https://platform.xiaomimimo.com",
             "apiKey": "",
-            "endpoint": "https://token-plan-cn.xiaomimimo.com/api/v1",
-            "model": "mimo-chat",
+            "endpoint": "https://api.xiaomimimo.com/v1",
+            "model": "mimo-v2.5-pro",
             "logo": "Mi",
             "status": "未检测",
             "useStandaloneTest": False,

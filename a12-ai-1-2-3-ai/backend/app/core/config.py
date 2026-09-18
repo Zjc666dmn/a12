@@ -47,6 +47,19 @@ class Settings(BaseSettings):
     active_model_name: str = ""
     teachnova_api_token: str = ""
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    kb_api_enabled: bool = True
+    kb_api_base_url: str = "http://127.0.0.1:8010"
+    kb_api_timeout_seconds: float = 4.0
+    # PPT 引擎编排（落地方案 第四阶段）：auto → presenton → pptxgenjs → svg_master
+    ppt_engine: str = "auto"
+    ppt_template: str = "fresh-luxury"
+    pptxgenjs_node_bin: str = ""
+    pptxgenjs_timeout_seconds: float = 90.0
+    presenton_base_url: str = "http://127.0.0.1:8001"
+    presenton_probe_timeout_seconds: float = 0.8
+    presenton_timeout_seconds: float = 420.0
+    presenton_template: str = "general"
+    presenton_workspace_map: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

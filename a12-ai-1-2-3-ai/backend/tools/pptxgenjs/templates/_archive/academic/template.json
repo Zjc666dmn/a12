@@ -1,0 +1,32 @@
+{
+  "id": "academic",
+  "name": "学术沉稳",
+  "ratio": "16:9",
+  "font": "Songti SC",
+  "description": "深蓝标题、衬线字体、克制配色，适合公开课与教研评审",
+  "colors": {
+    "background": "FBFBF8",
+    "surface": "FFFFFF",
+    "primary": "1F3A5F",
+    "primarySoft": "E3EAF3",
+    "text": "22293A",
+    "muted": "6E7787",
+    "line": "CBD5E1",
+    "accent": "B08968"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 38,
+      "subtitleSize": 17
+    },
+    "content": {
+      "titleSize": 26,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · 教研展示",
+  "series": "teachnova",
+  "decor": "rect",
+  "dark": false
+}

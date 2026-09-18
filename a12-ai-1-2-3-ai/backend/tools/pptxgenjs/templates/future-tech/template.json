@@ -1,0 +1,129 @@
+{
+  "id": "future-tech",
+  "name": "未来科技",
+  "version": 2,
+  "generation": 2,
+  "category": "tech",
+  "description": "深色背景、科技网格、发光线条与巨型数字，数据可视化强，适合理工与 AI 课程。",
+  "suitable": [
+    "AI 课程",
+    "计算机",
+    "科技课件",
+    "项目答辩"
+  ],
+  "tags": [
+    "AI 课程",
+    "计算机",
+    "科技课件"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": true,
+  "designSystem": {
+    "colors": {
+      "background": "050B18",
+      "surface": "0C1729",
+      "surfaceAlt": "122444",
+      "primary": "00E5FF",
+      "primarySoft": "0A3A4A",
+      "accent": "7C4DFF",
+      "accentSoft": "241A4D",
+      "text": "E8F4FF",
+      "muted": "7C93B0",
+      "line": "1E3244",
+      "onPrimary": "041018",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "PingFang SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.08,
+      "button": 0.2,
+      "image": 0.06
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 46,
+      "section": 38,
+      "head": 30,
+      "sub": 18,
+      "body": 15,
+      "micro": 10,
+      "metric": 46,
+      "quote": 28
+    },
+    "ornament": "glow-grid",
+    "cardStyle": "glass",
+    "titleStyle": "bar",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "dark"
+    }
+  },
+  "layouts": {
+    "cover": "cover-fullbleed",
+    "agenda": "agenda-grid",
+    "section": "section-full",
+    "content": [
+      "content-stack",
+      "content-columns"
+    ],
+    "cards": [
+      "cards-mosaic"
+    ],
+    "case": [
+      "case-card"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-hero"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-cta"
+    ],
+    "chart": [
+      "chart-metric"
+    ],
+    "table": [
+      "table-split"
+    ],
+    "timeline": [
+      "timeline-rail"
+    ],
+    "process": [
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-split"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

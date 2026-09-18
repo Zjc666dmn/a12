@@ -72,6 +72,8 @@ class UploadedFile(Base):
     file_name: Mapped[str] = mapped_column(String(255), nullable=False)
     file_type: Mapped[str] = mapped_column(String(100), nullable=False)
     file_path: Mapped[str] = mapped_column(String(500), nullable=False)
+    purpose: Mapped[str] = mapped_column(String(50), default="content", nullable=False)
+    focus: Mapped[str | None] = mapped_column(Text, nullable=True)
     parse_status: Mapped[str] = mapped_column(String(50), default="pending")
     parsed_content: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

@@ -1,3 +1,5 @@
+import json
+from collections.abc import Iterator
 from typing import Any
 
 import httpx
@@ -7,6 +9,9 @@ from app.services.model_config import get_active_model_config
 
 class LLMServiceError(RuntimeError):
     pass
+
+
+CONNECT_TIMEOUT = 15.0
 
 
 def call_active_chat_model(
@@ -68,13 +73,145 @@ def call_chat_model(
         raise LLMServiceError(str(exc)) from exc
 
 
+def stream_active_chat_model(
+    messages: list[dict[str, str]],
+    *,
+    system: str | None = None,
+    temperature: float = 0.3,
+    max_tokens: int = 1200,
+    timeout: float = 60,
+) -> Iterator[dict[str, str]]:
+    """逐块产出模型输出。
+
+    每块是一个 dict：{"type": "reasoning" | "delta" | "done", "text": str}。
+    reasoning 来自推理模型的 reasoning_content 字段（智能体思考过程），
+    delta 是可以直接追加到正文的增量文本。
+    """
+    yield from stream_chat_model(
+        get_active_model_config(),
+        messages,
+        system=system,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        timeout=timeout,
+    )
+
+
+def stream_chat_model(
+    model_config: dict[str, Any],
+    messages: list[dict[str, str]],
+    *,
+    system: str | None = None,
+    temperature: float = 0.3,
+    max_tokens: int = 1200,
+    timeout: float = 60,
+) -> Iterator[dict[str, str]]:
+    api_key = str(model_config.get("apiKey") or "")
+    endpoint = str(model_config.get("endpoint") or "")
+    model_name = str(model_config.get("model") or "")
+    if not api_key or not endpoint or not model_name:
+        raise LLMServiceError("模型配置缺少 API Key、请求地址或模型名称")
+
+    if _is_anthropic_compatible(endpoint, model_config):
+        # Anthropic 协议暂不逐块透传：整段产出后一次性下发，保证前端行为一致
+        text = _call_anthropic_compatible(
+            api_key=api_key,
+            endpoint=endpoint,
+            model_name=model_name,
+            messages=messages,
+            system=system,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            timeout=timeout,
+        )
+        yield {"type": "delta", "text": text}
+        return
+
+    yield from _stream_openai_compatible(
+        api_key=api_key,
+        endpoint=endpoint,
+        model_name=model_name,
+        messages=messages,
+        system=system,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        timeout=timeout,
+    )
+
+
+def _stream_openai_compatible(
+    *,
+    api_key: str,
+    endpoint: str,
+    model_name: str,
+    messages: list[dict[str, str]],
+    system: str | None,
+    temperature: float,
+    max_tokens: int,
+    timeout: float,
+) -> Iterator[dict[str, str]]:
+    payload = {
+        "model": model_name,
+        "messages": _openai_messages(messages, system),
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "stream": True,
+    }
+    emitted = False
+    try:
+        with httpx.stream(
+            "POST",
+            f"{endpoint.rstrip('/')}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "Accept": "text/event-stream",
+            },
+            json=payload,
+            timeout=httpx.Timeout(timeout, connect=CONNECT_TIMEOUT),
+        ) as response:
+            response.raise_for_status()
+            for raw_line in response.iter_lines():
+                if not raw_line:
+                    continue
+                line = raw_line.strip()
+                if line.startswith("data:"):
+                    line = line[5:].strip()
+                if not line or line == "[DONE]":
+                    if line == "[DONE]":
+                        break
+                    continue
+                try:
+                    chunk = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                choices = chunk.get("choices") or []
+                if not choices:
+                    continue
+                delta = choices[0].get("delta") or {}
+                reasoning = delta.get("reasoning_content") or delta.get("reasoning")
+                if reasoning:
+                    yield {"type": "reasoning", "text": str(reasoning)}
+                text = delta.get("content")
+                if text:
+                    emitted = True
+                    yield {"type": "delta", "text": str(text)}
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
+        raise LLMServiceError(str(exc)) from exc
+
+    if not emitted:
+        # 推理模型可能把预算全花在 reasoning_content 上，或直接返回空
+        raise LLMServiceError("模型流式返回了空内容，若是推理模型请增大 max_tokens 预算")
+
+
 def test_chat_model_connection(model_config: dict[str, Any]) -> None:
+    # 推理模型会先消耗 token 生成 reasoning_content，预算要留足
     call_chat_model(
         model_config,
         [{"role": "user", "content": "ping"}],
         temperature=0,
-        max_tokens=8,
-        timeout=15,
+        max_tokens=256,
+        timeout=60,
     )
 
 
@@ -150,7 +287,16 @@ def _call_openai_compatible(
     )
     response.raise_for_status()
     payload = response.json()
-    return str(payload["choices"][0]["message"]["content"]).strip()
+    message = payload["choices"][0]["message"]
+    content = str(message.get("content") or "").strip()
+    if not content:
+        # 推理模型（如 MiMo/o1）可能把全部 token 预算消耗在 reasoning_content 上
+        finish_reason = payload["choices"][0].get("finish_reason")
+        raise LLMServiceError(
+            f"模型返回了空内容（finish_reason={finish_reason}），"
+            "若是推理模型请增大 max_tokens 预算"
+        )
+    return content
 
 
 def _openai_messages(messages: list[dict[str, str]], system: str | None) -> list[dict[str, str]]:

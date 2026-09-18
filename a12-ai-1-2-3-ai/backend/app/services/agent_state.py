@@ -51,6 +51,9 @@ class AgentDecision:
     confidence: float = 0.5
     reason: str = ""
     tool_logs: list[ToolLog] = field(default_factory=list)
+    assumptions: list[str] = field(default_factory=list)
+    proactive: bool = False
+    source: str = "rules"
 
     def visible_steps(self, reference_count: int = 0, file_count: int = 0) -> list[str]:
         steps = [
@@ -60,6 +63,10 @@ class AgentDecision:
             steps.append(f"规则兜底发现还缺少：{'、'.join(self.missing_fields)}。")
         else:
             steps.append("规则兜底确认核心教学字段已较完整。")
+        if self.proactive:
+            steps.append("教师已把决策权交给智能体，本轮改为主动推进：先按合理默认值开工，只保留最低成本确认。")
+        for assumption in self.assumptions:
+            steps.append(f"本轮采用的默认设定：{assumption}")
         if file_count:
             steps.append(f"已关联 {file_count} 个上传资料，后续可用于内容融合。")
         if reference_count:

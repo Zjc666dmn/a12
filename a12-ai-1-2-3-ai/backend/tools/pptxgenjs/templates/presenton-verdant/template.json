@@ -1,0 +1,32 @@
+{
+  "id": "presenton-verdant",
+  "name": "青绿自然",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "Yuanti SC",
+  "decor": "wave",
+  "dark": false,
+  "description": "Presenton Verdant：有机绿意、柔和圆体，适合生物与自然课",
+  "colors": {
+    "background": "FFFFFF",
+    "surface": "D5E0D0",
+    "primary": "285F20",
+    "primarySoft": "B8CBAA",
+    "text": "FFFFFF",
+    "muted": "4B2D85",
+    "line": "BCCAB7",
+    "accent": "174F45"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Verdant"
+}

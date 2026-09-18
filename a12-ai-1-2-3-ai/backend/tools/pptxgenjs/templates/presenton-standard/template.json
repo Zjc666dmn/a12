@@ -1,0 +1,32 @@
+{
+  "id": "presenton-standard",
+  "name": "标准课堂",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "Microsoft YaHei",
+  "decor": "none",
+  "dark": true,
+  "description": "Presenton Standard：均衡稳重、蓝绿配色，适合日常授课",
+  "colors": {
+    "background": "1B8C2D",
+    "surface": "F3F4F6",
+    "primary": "3182BD",
+    "primarySoft": "3387C5",
+    "text": "FFFFFF",
+    "muted": "B9C0CC",
+    "line": "E5E7EB",
+    "accent": "20567D"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Standard"
+}

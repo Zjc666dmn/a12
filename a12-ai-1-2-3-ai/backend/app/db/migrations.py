@@ -12,6 +12,11 @@ TASK_INTENT_COLUMNS = {
     "intent_confidence": "VARCHAR(20)",
 }
 
+UPLOADED_FILE_COLUMNS = {
+    "purpose": "VARCHAR(50) NOT NULL DEFAULT 'content'",
+    "focus": "TEXT",
+}
+
 
 def ensure_task_intent_columns() -> None:
     inspector = inspect(engine)
@@ -30,3 +35,14 @@ def ensure_task_intent_columns() -> None:
     with engine.begin() as connection:
         for name, column_type in missing_columns:
             connection.execute(text(f"ALTER TABLE course_tasks ADD COLUMN {name} {column_type}"))
+
+
+def ensure_uploaded_file_columns() -> None:
+    inspector = inspect(engine)
+    if "uploaded_files" not in inspector.get_table_names():
+        return
+    existing_columns = {column["name"] for column in inspector.get_columns("uploaded_files")}
+    with engine.begin() as connection:
+        for name, column_type in UPLOADED_FILE_COLUMNS.items():
+            if name not in existing_columns:
+                connection.execute(text(f"ALTER TABLE uploaded_files ADD COLUMN {name} {column_type}"))

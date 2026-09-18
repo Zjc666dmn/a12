@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.router import api_router
 from app.core.config import settings
 from app.core.security import verify_request_token
-from app.db.migrations import ensure_task_intent_columns
+from app.db.migrations import ensure_task_intent_columns, ensure_uploaded_file_columns
 from app.db.session import Base, engine
 
 
@@ -22,6 +22,7 @@ def create_app() -> FastAPI:
     settings.outputs_dir.mkdir(parents=True, exist_ok=True)
     Base.metadata.create_all(bind=engine)
     ensure_task_intent_columns()
+    ensure_uploaded_file_columns()
 
     app = FastAPI(title=settings.app_name)
 

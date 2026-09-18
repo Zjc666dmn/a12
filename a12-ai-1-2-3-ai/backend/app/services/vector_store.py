@@ -1,5 +1,7 @@
 from typing import Any
 
+import threading
+
 import chromadb
 
 from app.core.config import settings
@@ -8,6 +10,21 @@ from app.services.embedding_service import embed_text, embed_texts, embedding_pr
 
 
 COLLECTION_NAME = "teachnova_chunks"
+
+# Cache the PersistentClient once: creating it on every call is expensive, and a
+# failed init inside a background job thread poisons chromadb's shared system
+# registry (subsequent calls raise "'RustBindingsAPI' object has no attribute
+# 'bindings'"). One client created on first use keeps that failure recoverable.
+_client_lock = threading.Lock()
+_client: chromadb.api.ClientAPI | None = None
+
+
+def _get_client() -> "chromadb.api.ClientAPI":
+    global _client
+    with _client_lock:
+        if _client is None:
+            _client = chromadb.PersistentClient(path=str(settings.vector_db_dir))
+        return _client
 
 
 def vectorize_file_chunks(file_id: int) -> int:
@@ -98,7 +115,7 @@ def _chunk_metadata(chunk: dict[str, Any]) -> dict[str, str | int | float | bool
 
 def _get_collection():
     profile = embedding_profile()
-    client = chromadb.PersistentClient(path=str(settings.vector_db_dir))
+    client = _get_client()
     return client.get_or_create_collection(
         name=profile["collection"],
         metadata={

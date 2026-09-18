@@ -1,0 +1,129 @@
+{
+  "id": "academic-paper",
+  "name": "学术论文",
+  "version": 2,
+  "generation": 2,
+  "category": "academic",
+  "description": "米白纸感、衬线字体、细分割线与脚注式排版，适合论文汇报与学术讲座。",
+  "suitable": [
+    "学术汇报",
+    "论文答辩",
+    "研究方法",
+    "文献综述"
+  ],
+  "tags": [
+    "学术汇报",
+    "论文答辩",
+    "研究方法"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "FBF7F0",
+      "surface": "FFFFFF",
+      "surfaceAlt": "F2EBE0",
+      "primary": "7A2E2E",
+      "primarySoft": "EFDCD6",
+      "accent": "4A5A3A",
+      "accentSoft": "DFE5D5",
+      "text": "242019",
+      "muted": "7C7161",
+      "line": "D8CEBE",
+      "onPrimary": "FFFFFF",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "Songti SC",
+      "body": "Songti SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.04,
+      "button": 0.1,
+      "image": 0.03
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.95,
+      "gap": 0.34
+    },
+    "type": {
+      "cover": 40,
+      "section": 34,
+      "head": 27,
+      "sub": 17,
+      "body": 15,
+      "micro": 10,
+      "metric": 36,
+      "quote": 26
+    },
+    "ornament": "paper-edge",
+    "cardStyle": "underline",
+    "titleStyle": "underline",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-centered",
+    "agenda": "agenda-index",
+    "section": "section-side",
+    "content": [
+      "content-lead",
+      "content-columns"
+    ],
+    "cards": [
+      "cards-stack"
+    ],
+    "case": [
+      "case-brief"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-left"
+    ],
+    "metrics": [
+      "metrics-grid"
+    ],
+    "summary": [
+      "summary-map"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-full"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-vertical"
+    ],
+    "process": [
+      "process-steps"
+    ],
+    "compare": [
+      "compare-table"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

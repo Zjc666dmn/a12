@@ -1,0 +1,32 @@
+{
+  "id": "presenton-mosaic",
+  "name": "几何拼贴",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "decor": "grid",
+  "dark": false,
+  "description": "Presenton Mosaic：模块化色块与圆角几何，适合知识点罗列",
+  "colors": {
+    "background": "FFFFFF",
+    "surface": "FBFBFB",
+    "primary": "7C6AF4",
+    "primarySoft": "A083ED",
+    "text": "FFFFFF",
+    "muted": "666666",
+    "line": "000000",
+    "accent": "C5E3B4"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Mosaic"
+}

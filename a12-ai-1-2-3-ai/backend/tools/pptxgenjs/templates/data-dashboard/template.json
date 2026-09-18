@@ -1,0 +1,131 @@
+{
+  "id": "data-dashboard",
+  "name": "数据驾驶舱",
+  "version": 2,
+  "generation": 2,
+  "category": "business",
+  "description": "仪表盘式布局、指标卡与趋势图，适合学情分析、成绩分析与教学诊断。",
+  "suitable": [
+    "学情分析",
+    "成绩诊断",
+    "数据复盘",
+    "教育测量"
+  ],
+  "tags": [
+    "学情分析",
+    "成绩诊断",
+    "数据复盘"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": true,
+  "designSystem": {
+    "colors": {
+      "background": "0B1220",
+      "surface": "131C2E",
+      "surfaceAlt": "1B2740",
+      "primary": "35D0BA",
+      "primarySoft": "134038",
+      "accent": "FFB020",
+      "accentSoft": "453116",
+      "text": "E6EDF7",
+      "muted": "7F90AA",
+      "line": "24314C",
+      "onPrimary": "04231E",
+      "onAccent": "3A2A00"
+    },
+    "fonts": {
+      "heading": "Heiti SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.06,
+      "button": 0.16,
+      "image": 0.05
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 44,
+      "section": 36,
+      "head": 28,
+      "sub": 18,
+      "body": 14,
+      "micro": 10,
+      "metric": 44,
+      "quote": 26
+    },
+    "ornament": "blueprint",
+    "cardStyle": "tinted",
+    "titleStyle": "number",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "dark"
+    }
+  },
+  "layouts": {
+    "cover": "cover-fullbleed",
+    "agenda": "agenda-grid",
+    "section": "section-full",
+    "content": [
+      "content-stack",
+      "content-columns"
+    ],
+    "cards": [
+      "cards-mosaic"
+    ],
+    "case": [
+      "case-card"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-grid",
+      "metrics-hero"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-cta"
+    ],
+    "chart": [
+      "chart-metric",
+      "chart-full"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-rail"
+    ],
+    "process": [
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-table"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

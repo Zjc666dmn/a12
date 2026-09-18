@@ -83,7 +83,7 @@ def generate_docx_asset(db: Session, task: CourseTask) -> dict[str, Any]:
         task_id=task.id,
         asset_type="lesson_plan_docx",
         file_path=f"docx/{output_path.name}",
-        version=1,
+        version=next_asset_version(db, task.id, "lesson_plan_docx"),
     )
     db.add(asset)
     task.status = "review"
@@ -102,23 +102,25 @@ def generate_pptx_asset(db: Session, task: CourseTask) -> dict[str, Any]:
     output_path, plan, engine = generate_pptx_with_ppt_agent(task)
     quality_report = inspect_pptx_quality(output_path, expected_title=str(plan.get("title") or task.title))
     report_path = save_pptx_quality_report(task.id, quality_report)
+    version = next_asset_version(db, task.id, "lesson_plan_pptx")
     asset = GeneratedAsset(
         task_id=task.id,
         asset_type="lesson_plan_pptx",
         file_path=f"ppt/{output_path.name}",
-        version=1,
+        version=version,
     )
     db.add(asset)
     task.status = "review"
     db.commit()
     return {
         "status": "generated",
-        "message": "PPT 课件已生成。",
+        "message": f"PPT 课件已生成（引擎: {engine}）。",
         "asset": f"ppt/{output_path.name}",
         "quality_report_asset": f"ppt/qa/{report_path.name}",
         "quality_report": pptx_quality_to_dict(quality_report),
         "lesson_plan_title": plan.get("title"),
         "engine": engine,
+        "version": version,
     }
 
 
@@ -154,7 +156,8 @@ def iterate_assets(
 
     if regenerate_docx:
         docx_path, _ = generate_docx_lesson_plan(task)
-        docx_version_path = copy_versioned(docx_path, version)
+        docx_version = next_asset_version(db, task.id, "lesson_plan_docx")
+        docx_version_path = copy_versioned(docx_path, docx_version)
         docx_quality = inspect_docx_quality(docx_version_path)
         docx_report_path = save_docx_quality_report(task.id, docx_quality)
         db.add(
@@ -162,7 +165,7 @@ def iterate_assets(
                 task_id=task.id,
                 asset_type="lesson_plan_docx",
                 file_path=f"docx/{docx_version_path.name}",
-                version=version,
+                version=docx_version,
             )
         )
         result.update(
@@ -175,7 +178,8 @@ def iterate_assets(
 
     if regenerate_pptx:
         pptx_path, _, engine = generate_pptx_with_ppt_agent(task)
-        pptx_version_path = copy_versioned(pptx_path, version)
+        pptx_version = next_asset_version(db, task.id, "lesson_plan_pptx")
+        pptx_version_path = copy_versioned(pptx_path, pptx_version)
         pptx_quality = inspect_pptx_quality(pptx_version_path, expected_title=str(plan.get("title") or task.title))
         pptx_report_path = save_pptx_quality_report(task.id, pptx_quality)
         db.add(
@@ -183,7 +187,7 @@ def iterate_assets(
                 task_id=task.id,
                 asset_type="lesson_plan_pptx",
                 file_path=f"ppt/{pptx_version_path.name}",
-                version=version,
+                version=pptx_version,
             )
         )
         result.update(

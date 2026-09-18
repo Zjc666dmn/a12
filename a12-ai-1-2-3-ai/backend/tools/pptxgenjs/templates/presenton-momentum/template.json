@@ -1,0 +1,32 @@
+{
+  "id": "presenton-momentum",
+  "name": "势能科技",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "decor": "wave",
+  "dark": false,
+  "description": "Presenton Momentum：深蓝主调、数据感强，适合理工与实验课",
+  "colors": {
+    "background": "F6F7FC",
+    "surface": "FFFFFF",
+    "primary": "213EBB",
+    "primarySoft": "D1DAF1",
+    "text": "FFFFFF",
+    "muted": "2E3545",
+    "line": "1A3DB3",
+    "accent": "213EBB"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Momentum"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "presenton-dynamic",
+  "name": "暗夜动感",
+  "series": "presenton",
+  "ratio": "16:9",
+  "font": "PingFang SC",
+  "decor": "rect",
+  "dark": true,
+  "description": "Presenton Dynamic：深色底 + 暖橙高对比，适合公开课与汇报展示",
+  "colors": {
+    "background": "171717",
+    "surface": "000000",
+    "primary": "C24D12",
+    "primarySoft": "111111",
+    "text": "FFFFFF",
+    "muted": "B9C0CC",
+    "line": "FFFFFF",
+    "accent": "C24D12"
+  },
+  "layouts": {
+    "cover": {
+      "titleSize": 42,
+      "subtitleSize": 18
+    },
+    "content": {
+      "titleSize": 28,
+      "bulletSize": 15,
+      "sideWidthIn": 2.4
+    }
+  },
+  "footer": "TeachNova · Presenton Dynamic"
+}

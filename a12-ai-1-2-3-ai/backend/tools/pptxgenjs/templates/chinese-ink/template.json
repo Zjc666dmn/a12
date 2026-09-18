@@ -1,0 +1,129 @@
+{
+  "id": "chinese-ink",
+  "name": "水墨国学",
+  "version": 2,
+  "generation": 2,
+  "category": "creative",
+  "description": "宣纸底色、水墨留白、印章与书法标题，适合语文、历史与国学课程。",
+  "suitable": [
+    "语文",
+    "历史",
+    "国学",
+    "传统文化"
+  ],
+  "tags": [
+    "语文",
+    "历史",
+    "国学"
+  ],
+  "footer": "AI 互动式教学智能体 · TeachNova",
+  "dark": false,
+  "designSystem": {
+    "colors": {
+      "background": "F5EFE1",
+      "surface": "FBF7EE",
+      "surfaceAlt": "E9DFC9",
+      "primary": "2B2B2B",
+      "primarySoft": "DCD3C0",
+      "accent": "A2372F",
+      "accentSoft": "EFD9D5",
+      "text": "26221C",
+      "muted": "7A7263",
+      "line": "CFC5AE",
+      "onPrimary": "F5EFE1",
+      "onAccent": "FFFFFF"
+    },
+    "fonts": {
+      "heading": "STKaiti",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.03,
+      "button": 0.06,
+      "image": 0.02
+    },
+    "shadow": {
+      "enabled": false,
+      "opacity": 0.14,
+      "offset": 2,
+      "blur": 8
+    },
+    "spacing": {
+      "margin": 0.85,
+      "gap": 0.34
+    },
+    "type": {
+      "cover": 46,
+      "section": 38,
+      "head": 30,
+      "sub": 18,
+      "body": 16,
+      "micro": 11,
+      "metric": 38,
+      "quote": 30
+    },
+    "ornament": "ink-corner",
+    "cardStyle": "outline",
+    "titleStyle": "center",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "light"
+    }
+  },
+  "layouts": {
+    "cover": "cover-centered",
+    "agenda": "agenda-index",
+    "section": "section-side",
+    "content": [
+      "content-lead",
+      "content-columns"
+    ],
+    "cards": [
+      "cards-stack"
+    ],
+    "case": [
+      "case-brief"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-grid"
+    ],
+    "summary": [
+      "summary-map"
+    ],
+    "ending": [
+      "ending-center"
+    ],
+    "chart": [
+      "chart-full"
+    ],
+    "table": [
+      "table-full"
+    ],
+    "timeline": [
+      "timeline-vertical"
+    ],
+    "process": [
+      "process-steps"
+    ],
+    "compare": [
+      "compare-split"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "id": "ai-agent",
+  "name": "AI 智能体",
+  "version": 2,
+  "generation": 2,
+  "category": "tech",
+  "description": "深色底、神经网络节点与粒子光效，流程与智能体编排页表现最强（TeachNova 品牌模板）。",
+  "suitable": [
+    "AI 通识",
+    "智能体课程",
+    "编程课",
+    "科技竞赛"
+  ],
+  "tags": [
+    "AI 通识",
+    "智能体课程",
+    "编程课"
+  ],
+  "footer": "TeachNova · AI 互动式教学智能体",
+  "dark": true,
+  "designSystem": {
+    "colors": {
+      "background": "0A0F1E",
+      "surface": "111A2E",
+      "surfaceAlt": "182342",
+      "primary": "6C5CE7",
+      "primarySoft": "231F4D",
+      "accent": "00D2FF",
+      "accentSoft": "0C3746",
+      "text": "EAF0FF",
+      "muted": "7F8CB0",
+      "line": "222E4D",
+      "onPrimary": "FFFFFF",
+      "onAccent": "04222B"
+    },
+    "fonts": {
+      "heading": "PingFang SC",
+      "body": "PingFang SC",
+      "micro": "PingFang SC",
+      "headingWeight": "bold"
+    },
+    "radius": {
+      "card": 0.1,
+      "button": 0.24,
+      "image": 0.08
+    },
+    "shadow": {
+      "enabled": true,
+      "opacity": 0.2,
+      "offset": 3,
+      "blur": 14,
+      "color": "4B3CE0"
+    },
+    "spacing": {
+      "margin": 0.72,
+      "gap": 0.3
+    },
+    "type": {
+      "cover": 46,
+      "section": 38,
+      "head": 30,
+      "sub": 18,
+      "body": 15,
+      "micro": 10,
+      "metric": 44,
+      "quote": 28
+    },
+    "ornament": "glow-grid",
+    "cardStyle": "glass",
+    "titleStyle": "bar",
+    "imageStyle": {
+      "radius": 0.12,
+      "shadow": false,
+      "mask": "soft"
+    },
+    "chartStyle": {
+      "mode": "dark"
+    }
+  },
+  "layouts": {
+    "cover": "cover-fullbleed",
+    "agenda": "agenda-grid",
+    "section": "section-full",
+    "content": [
+      "content-stack",
+      "content-columns"
+    ],
+    "cards": [
+      "cards-mosaic"
+    ],
+    "case": [
+      "case-card"
+    ],
+    "activity": [
+      "activity-cards"
+    ],
+    "quote": [
+      "quote-centered"
+    ],
+    "metrics": [
+      "metrics-grid"
+    ],
+    "summary": [
+      "summary-board"
+    ],
+    "ending": [
+      "ending-cta"
+    ],
+    "chart": [
+      "chart-metric"
+    ],
+    "table": [
+      "table-split"
+    ],
+    "timeline": [
+      "timeline-rail"
+    ],
+    "process": [
+      "process-cycle",
+      "process-chevron"
+    ],
+    "compare": [
+      "compare-split"
+    ]
+  },
+  "rhythm": {
+    "sectionEvery": 5,
+    "alternateBg": false,
+    "avoidRepeat": true
+  }
+}

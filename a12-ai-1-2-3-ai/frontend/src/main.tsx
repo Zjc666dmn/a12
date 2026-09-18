@@ -12,20 +12,22 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       theme={{
         algorithm: theme.defaultAlgorithm,
         token: {
-          colorPrimary: '#2563eb',
-          colorInfo: '#0891b2',
-          colorSuccess: '#16a34a',
-          colorWarning: '#d97706',
-          borderRadius: 8,
+          colorPrimary: '#5876df',
+          colorInfo: '#5876df',
+          colorSuccess: '#45a978',
+          colorWarning: '#d99443',
+          colorText: '#263b5d',
+          colorTextSecondary: '#7f8da1',
+          colorBorder: '#e2e8ef',
+          borderRadius: 10,
           fontFamily:
             'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         },
         components: {
-          Card: { borderRadiusLG: 8 },
-          Button: { borderRadius: 8, controlHeight: 36 },
-          Input: { borderRadius: 8 },
-          Layout: { siderBg: '#0f172a', bodyBg: '#f6f8fb' },
-          Menu: { darkItemBg: '#0f172a', darkSubMenuItemBg: '#0f172a' },
+          Card: { borderRadiusLG: 16 },
+          Button: { borderRadius: 10, controlHeight: 36 },
+          Input: { borderRadius: 10 },
+          Modal: { borderRadiusLG: 18 },
         },
       }}
     >

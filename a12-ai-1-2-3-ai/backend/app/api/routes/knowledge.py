@@ -13,6 +13,7 @@ from app.schemas.knowledge import (
 )
 from app.services.chunk_service import build_chunks_for_file, get_all_chunks, get_file_chunks, search_chunks
 from app.services.embedding_service import embedding_profile
+from app.services.external_kb import kb_search, merge_results
 from app.services.vector_store import vector_search, vector_store_count, vectorize_all_chunks, vectorize_file_chunks
 
 router = APIRouter()
@@ -20,22 +21,32 @@ router = APIRouter()
 
 @router.post("/search", response_model=KnowledgeSearchResponse)
 def search_knowledge(payload: KnowledgeSearchRequest) -> KnowledgeSearchResponse:
-    results = search_chunks(payload.query, payload.top_k)
+    local_results = search_chunks(payload.query, payload.top_k)
+    kb_results = kb_search(payload.query, payload.top_k)
+    merged, kb_count = merge_results(local_results, kb_results, payload.top_k)
+    message = f"检索到 {len(merged)} 条知识切片"
+    if kb_count:
+        message += f"（含知识库V2 {kb_count} 条）"
     return KnowledgeSearchResponse(
         query=payload.query,
-        results=results,
-        message=f"检索到 {len(results)} 条知识切片",
+        results=merged,
+        message=message,
     )
 
 
 @router.post("/vector-search", response_model=KnowledgeSearchResponse)
 def search_vector_knowledge(payload: KnowledgeSearchRequest) -> KnowledgeSearchResponse:
-    results = vector_search(payload.query, payload.top_k)
+    local_results = vector_search(payload.query, payload.top_k)
+    kb_results = kb_search(payload.query, payload.top_k)
+    merged, kb_count = merge_results(local_results, kb_results, payload.top_k)
     profile = embedding_profile()
+    message = f"向量检索到 {len(merged)} 条知识切片（{profile['provider']} · {profile['dimension']}维）"
+    if kb_count:
+        message += f"，含知识库V2 {kb_count} 条"
     return KnowledgeSearchResponse(
         query=payload.query,
-        results=results,
-        message=f"向量检索到 {len(results)} 条知识切片（{profile['provider']} · {profile['dimension']}维）",
+        results=merged,
+        message=message,
         embedding=profile,
     )
 
